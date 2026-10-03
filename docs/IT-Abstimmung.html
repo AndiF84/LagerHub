@@ -315,13 +315,14 @@
 
 <header class="head">
   <div class="head__inner">
-    <p class="head__eyebrow">Vorbereitung Umzug · Stand 23.08.2026</p>
+    <p class="head__eyebrow">Vorbereitung Umzug · Stand 03.10.2026</p>
     <h1>LagerHub auf den Firmenserver – was die IT beantworten muss</h1>
     <p>
       LagerHub ist die Aufgabenverwaltung fürs Lager: ein Dashboard für die Leitung und eine
       Handy-App für die Mitarbeiter, beide in Echtzeit verbunden. Bisher läuft alles auf dem
-      Entwicklungsrechner mit einer Datenbank in der Cloud. Ziel ist der Betrieb auf einem
-      eigenen Server als vier Docker-Container.
+      Entwicklungsrechner. Ziel ist der Betrieb auf einem Windows Server im Firmennetz:
+      IIS als Web-Zugang, das Programm als Windows-Dienst, PostgreSQL als Datenbank auf
+      derselben Maschine.
     </p>
   </div>
 </header>
@@ -373,13 +374,13 @@
 
       <article class="card">
         <div class="card__num">3</div>
-        <p class="card__q">Darf Port 443 von außen auf den Server – und wenn nein, welchen Weg gibt es?</p>
+        <p class="card__q">Wer gibt dem Server Schreibzugriff auf die DNS-Zone, damit er sein Zertifikat holen kann?</p>
         <p class="card__why">
-          Für die automatische Zertifikatsausstellung über Let’s Encrypt genügt
-          <strong>443</strong>. <code>80</code> brauche ich nur, um Aufrufe ohne <code>https://</code>
-          umzuleiten. Ist von außen gar nichts erlaubt, geht es über einen DNS-Nachweis – dafür
-          braucht der Server jedoch <strong>Schreibzugriff auf die DNS-Zone per API-Schlüssel</strong>.
-          Wer könnte den bereitstellen?
+          Das Zertifikat holt <strong>win-acme</strong> bei Let’s Encrypt über den
+          <strong>DNS-Nachweis (DNS-01)</strong>: Der Server legt kurz einen DNS-Eintrag an, statt
+          einen Port nach außen zu öffnen. Von außen muss also nichts erreichbar sein. Dafür
+          braucht win-acme <strong>Schreibzugriff auf die DNS-Zone per API-Schlüssel</strong>.
+          Wer könnte den bereitstellen? Ist das nicht möglich, siehe Punkt 10.
           <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
         </p>
       </article>
@@ -391,9 +392,10 @@
           Dashboard und Handy-App halten eine dauerhafte Verbindung offen (<code>/ws</code>), über
           die Änderungen sofort ankommen. Zwei Dinge brechen das regelmäßig:
           <strong>der HTTP-Upgrade wird nicht durchgereicht</strong>, oder ein
-          <strong>kurzer Leerlauf-Timeout</strong> kappt die stille Verbindung. Die App verbindet
-          sich zwar automatisch neu, aber im Minutentakt zu trennen macht die Echtzeit-Anzeige
-          wertlos. Falls es einen solchen Proxy gibt, brauche ich seinen Namen und wer ihn konfiguriert.
+          <strong>kurzer Leerlauf-Timeout</strong> kappt die stille Verbindung. Der Server sendet
+          deshalb alle 20 Sekunden ein Lebenszeichen, und die App verbindet sich automatisch neu.
+          Bei einem Timeout unter 20 Sekunden hilft das nicht mehr – im Minutentakt zu trennen
+          macht die Echtzeit-Anzeige wertlos. Falls es einen solchen Proxy gibt, brauche ich seinen Namen und wer ihn konfiguriert.
           <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
         </p>
       </article>
@@ -402,9 +404,10 @@
         <div class="card__num">5</div>
         <p class="card__q">Darf der Server nach außen telefonieren – und wenn nur über einen Proxy, über welchen?</p>
         <p class="card__why">
-          Vier Ziele, alle über <code>443</code>: die Zertifikatsstelle, die Push-Dienste von
-          Google, Mozilla und Apple (dorthin gehen die Handy-Benachrichtigungen), die
-          Zeiterfassung <code>api.crewmeister.com</code> und beim Bauen die Paketquellen. Die
+          Drei Ziele, alle über <code>443</code>: die Zertifikatsstelle, die Push-Dienste von
+          Google, Mozilla und Apple (dorthin gehen die Handy-Benachrichtigungen) und die
+          Zeiterfassung <code>api.crewmeister.com</code>. Die Programmbibliotheken bringt das
+          Übergabe-Paket fertig mit, eine Paketquelle braucht der Server also nicht. Die
           vollständige Liste steht unten im Faktenblatt. Wenn der Server nur über einen
           Unternehmens-Proxy ins Internet darf, brauche ich dessen Adresse.
           <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
@@ -453,8 +456,10 @@
         <div class="card__num">9</div>
         <p class="card__q">Wer betreibt den Server im Alltag?</p>
         <p class="card__why">
-          Konkret: Wer startet die Container nach einem Neustart oder Stromausfall (das erledigt
-          Docker selbst, wenn es so eingerichtet ist), wer spielt Betriebssystem-Updates ein, wer
+          Konkret: Wer prüft nach einem Neustart oder Stromausfall, dass der Dienst wieder läuft
+          (er startet als Windows-Dienst über NSSM von selbst, auch nach einem Absturz), wer
+          spielt Windows-Updates ein und wer erneuert das Zertifikat, falls die geplante Aufgabe
+          von win-acme einmal scheitert, wer
           merkt es, wenn der Dienst steht – und wer darf sich überhaupt auf dem Server anmelden?
           <span class="card__tags"><span class="chip chip--later">vor Livegang</span></span>
         </p>
@@ -480,36 +485,36 @@
       <h2>Teil 2 · Faktenblatt für die IT</h2>
       <p>
         Das, was die IT wissen muss, um die Fragen oben beantworten zu können. Nach außen sichtbar
-        ist ein einziger Dienst; Datenbank und Zwischenspeicher bleiben im internen Docker-Netz und
-        bekommen keine Ports nach draußen.
+        ist allein IIS; Programm und Datenbank nehmen nur Verbindungen von derselben Maschine
+        (<code>localhost</code>) an und bekommen keine Ports ins Netz.
       </p>
     </div>
 
     <div class="table-scroll" style="margin-bottom: 18px;">
       <table>
         <thead>
-          <tr><th>Dienst</th><th>Aufgabe</th><th>Erreichbar</th></tr>
+          <tr><th>Baustein</th><th>Aufgabe</th><th>Erreichbar</th></tr>
         </thead>
         <tbody>
           <tr>
-            <td>Caddy</td>
-            <td>Web-Zugang, Zertifikate, verteilt auf die anderen<span class="note">holt und erneuert Let’s-Encrypt-Zertifikate selbstständig</span></td>
-            <td><strong>80, 443</strong><span class="note">einzige offene Ports</span></td>
+            <td>IIS mit ARR</td>
+            <td>Web-Zugang mit HTTPS, liefert Dashboard und Handy-App aus<span class="note">leitet <code>/api</code> und <code>/ws</code> an das Programm weiter</span></td>
+            <td><strong>443</strong><span class="note">einziger offener Port, nur im Firmennetz</span></td>
           </tr>
           <tr>
-            <td>Backend</td>
-            <td>Node.js / Fastify – Programmlogik, WebSocket<span class="note">bedient <code>/api</code> und <code>/ws</code></span></td>
-            <td>3000<span class="note">nur intern</span></td>
+            <td>win-acme</td>
+            <td>Holt und erneuert das Let’s-Encrypt-Zertifikat<span class="note">trägt es in IIS ein, Erneuerung als geplante Aufgabe</span></td>
+            <td>–<span class="note">nur ausgehend</span></td>
           </tr>
           <tr>
-            <td>PostgreSQL</td>
-            <td>Datenbank – Aufgaben, Mitarbeiter, Arbeitszeit-Historie</td>
-            <td>5432<span class="note">nur intern, eigenes Volume</span></td>
+            <td>LagerHub-Dienst</td>
+            <td>Node.js / Fastify – Programmlogik, WebSocket, verteilt die Live-Ereignisse<span class="note">Windows-Dienst über NSSM</span></td>
+            <td>3000<span class="note">nur <code>localhost</code></span></td>
           </tr>
           <tr>
-            <td>Redis</td>
-            <td>Verteilt Live-Ereignisse an die verbundenen Clients<span class="note">kein dauerhafter Datenbestand</span></td>
-            <td>6379<span class="note">nur intern</span></td>
+            <td>PostgreSQL 17</td>
+            <td>Datenbank – Aufgaben, Mitarbeiter, Arbeitszeit-Historie<span class="note">Windows-Dienst</span></td>
+            <td>5432<span class="note">nur <code>localhost</code></span></td>
           </tr>
         </tbody>
       </table>
@@ -537,9 +542,9 @@
             <td>jede Minute</td>
           </tr>
           <tr>
-            <td><code>registry-1.docker.io</code>, <code>registry.npmjs.org</code>:443</td>
-            <td>Bausteine beim Erstellen der Container</td>
-            <td>nur beim Aufsetzen und bei Updates</td>
+            <td><code>registry.npmjs.org</code>:443</td>
+            <td>Programmbibliotheken laden<span class="note">entfällt mit dem Übergabe-Paket, das alles fertig mitbringt</span></td>
+            <td>nur, falls auf dem Server gebaut wird</td>
           </tr>
         </tbody>
       </table>
@@ -551,7 +556,8 @@
           <tr><th>Anforderung</th><th>Wert</th></tr>
         </thead>
         <tbody>
-          <tr><td>Betriebssystem</td><td>Linux mit Docker und Docker Compose<span class="note">Windows Server ginge, kostet aber mehr Handarbeit</span></td></tr>
+          <tr><td>Betriebssystem</td><td>Windows Server mit IIS<span class="note">dazu die IIS-Erweiterungen URL Rewrite und ARR sowie das Windows-Feature „WebSocket-Protokoll“</span></td></tr>
+          <tr><td>Software</td><td>Node.js 24, PostgreSQL 17, NSSM, win-acme<span class="note">aus den Quellen der IT, nicht vom Übergabe-Stick</span></td></tr>
           <tr><td>Rechenleistung</td><td>Richtwert 2 CPU-Kerne, 4 GB RAM<span class="note">Schätzung für ein Lagerteam – die Last ist gering</span></td></tr>
           <tr><td>Speicherplatz</td><td>20 GB plus Wachstum der Historie</td></tr>
           <tr><td>Zeitzone</td><td><code>Europe/Berlin</code>, Uhr per Zeitserver nachgeführt</td></tr>
@@ -580,20 +586,22 @@
 
       <article class="decision">
         <h3>Die alten Daten</h3>
-        <span class="rec">Vorschlag: frisch anfangen</span>
+        <span class="rec">Entschieden: frisch anfangen</span>
         <p>
-          Bisher war alles ein Testsystem. Ein Umzug der bestehenden Datenbank würde die alten
-          Probeläufe in die Auswertung des echten Betriebs mischen. Alternativ übernehme ich alles
-          per Datenbank-Abzug.
+          Bisher war alles ein Testsystem. Ein Umzug der bestehenden Datenbank hätte die alten
+          Probeläufe in die Auswertung des echten Betriebs gemischt. Der Server startet deshalb
+          mit einer leeren Datenbank.
         </p>
       </article>
 
       <article class="decision">
         <h3>Das Betriebssystem</h3>
-        <span class="rec">Vorschlag: Linux (Ubuntu LTS)</span>
+        <span class="rec">Entschieden: Windows Server, ohne Docker</span>
         <p>
-          Der eingespielte Normalfall für Docker. Wenn bei euch ohnehin nur Windows Server
-          betrieben wird, geht das auch – dann beschreibe ich die Abweichungen in der Anleitung.
+          Im Haus wird Windows Server betrieben. LagerHub läuft dort direkt: IIS als Web-Zugang,
+          das Programm als Windows-Dienst, PostgreSQL lokal. Den früher nötigen Zwischenspeicher
+          (Redis) gibt es für Windows nicht offiziell – die Live-Ereignisse verteilt das Programm
+          deshalb jetzt selbst.
         </p>
       </article>
 
@@ -646,9 +654,10 @@
   </section>
 
   <footer>
-    Zusammengestellt aus dem aktuellen Stand des Projekts. Sobald die rot markierten Punkte
-    beantwortet sind, erstelle ich die Server-Konfiguration (Docker-Dateien, Web-Zugang,
-    Umgebungsvorlage) und eine Schritt-für-Schritt-Anleitung für die Einrichtung.
+    Zusammengestellt aus dem aktuellen Stand des Projekts. Die Server-Konfiguration
+    (<code>web.config</code> für IIS, Vorlage der Einstellungsdatei) liegt bereits vor; die
+    Einrichtung beschreiben die <strong>Serverübergabe</strong> und der Laufzettel
+    <strong>Installationstag</strong>. Offen sind nur noch die Antworten auf die rot markierten Punkte.
   </footer>
 
 </div>
