@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Settings" ADD COLUMN     "breakEnd" TEXT NOT NULL DEFAULT '12:30',
+ADD COLUMN     "breakStart" TEXT NOT NULL DEFAULT '12:00';

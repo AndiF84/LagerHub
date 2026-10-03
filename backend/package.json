@@ -1,0 +1,46 @@
+{
+  "name": "lagerhub-backend",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:check": "tsx src/scripts/check-db.ts",
+    "db:studio": "prisma studio",
+    "backfill:worklog": "tsx src/scripts/backfill-worklog.ts",
+    "test:push": "tsx src/scripts/test-push.ts",
+    "fix:orphans": "tsx src/scripts/fix-orphaned-assignments.ts",
+    "db:test:setup": "tsx src/scripts/setup-test-db.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.3.0",
+    "@fastify/jwt": "^10.2.2",
+    "@fastify/websocket": "^11.3.1",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "dotenv": "^18.0.3",
+    "fastify": "^5.12.5",
+    "node-cron": "^4.6.0",
+    "web-push": "^3.6.7",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@types/web-push": "^3.6.4",
+    "prisma": "^7.10.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  }
+}

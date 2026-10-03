@@ -1,0 +1,654 @@
+<title>LagerHub auf den Firmenserver – Abstimmung mit der IT</title>
+
+<style>
+  /* ---------------------------------------------------------------
+     Farbwelt aus dem Produkt übernommen (CLAUDE.md, Abschnitt Design):
+     Navy #212C3D trägt weißen Text, Gold #EEC643 nur als Fläche/Linie
+     mit Navy darauf – nie Gold-Text auf Weiß (Kontrast unter AA).
+     Neutrale sind leicht ins Navy gezogen, nicht reines Grau.
+     --------------------------------------------------------------- */
+  :root {
+    --navy: #212c3d;
+    --navy-600: #2c3a4f;
+    --gold: #eec643;
+
+    --bg: #eef1f5;
+    --surface: #ffffff;
+    --surface-2: #f7f9fb;
+    --text: #1c2634;
+    --muted: #5d6b7e;
+    --border: #d8dfe8;
+    --border-strong: #c3cddb;
+
+    --blocker: #b42318;
+    --blocker-bg: #fdeceb;
+    --later: #8a5d00;
+    --later-bg: #fdf5e2;
+    --ok: #14804a;
+
+    --shadow-sm: 0 1px 2px rgba(23, 33, 48, 0.06);
+    --shadow-md: 0 2px 10px rgba(23, 33, 48, 0.09);
+
+    --sans: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "Consolas", "SF Mono", Menlo, monospace;
+
+    --r-sm: 5px;
+    --r-md: 9px;
+    --r-lg: 14px;
+  }
+
+  /* System-Voreinstellung (kein data-theme am Root): nur prefers-color-scheme
+     entscheidet. Guard sorgt dafür, dass eine ausdrückliche Hell-Wahl gewinnt. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171f;
+      --surface: #1b222d;
+      --surface-2: #212a37;
+      --text: #e6ebf2;
+      --muted: #9aa8ba;
+      --border: #2e3947;
+      --border-strong: #3d4a5b;
+
+      --blocker: #ff9d95;
+      --blocker-bg: #3a1f1d;
+      --later: #f0c65c;
+      --later-bg: #362c14;
+      --ok: #5ed39a;
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 12px rgba(0, 0, 0, 0.45);
+    }
+  }
+  /* Ausdrückliche Dunkel-Wahl schlägt ein helles Betriebssystem. */
+  :root[data-theme="dark"] {
+    --bg: #12171f;
+    --surface: #1b222d;
+    --surface-2: #212a37;
+    --text: #e6ebf2;
+    --muted: #9aa8ba;
+    --border: #2e3947;
+    --border-strong: #3d4a5b;
+
+    --blocker: #ff9d95;
+    --blocker-bg: #3a1f1d;
+    --later: #f0c65c;
+    --later-bg: #362c14;
+    --ok: #5ed39a;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 12px rgba(0, 0, 0, 0.45);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 20px 96px;
+  }
+
+  /* --- Kopf: Navy mit Gold-Akzentlinie – dasselbe Muster wie die Topbar
+         der beiden Apps, damit das Papier zum Produkt gehört. --- */
+  .head {
+    background: linear-gradient(160deg, var(--navy-600), var(--navy));
+    border-bottom: 3px solid var(--gold);
+    color: #fff;
+    padding: 40px 0 34px;
+    margin-bottom: 40px;
+  }
+  .head__inner { max-width: 940px; margin: 0 auto; padding: 0 20px; }
+  .head__eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .head h1 {
+    margin: 0 0 14px;
+    font-size: clamp(1.7rem, 1.2rem + 2vw, 2.3rem);
+    line-height: 1.2;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  .head p {
+    margin: 0;
+    max-width: 64ch;
+    color: #c8d2e0;
+    font-size: 1.02rem;
+  }
+
+  /* --- Abschnitte --- */
+  section { margin-bottom: 52px; }
+
+  .sec-head { margin-bottom: 20px; }
+  .sec-head h2 {
+    margin: 0 0 6px;
+    font-size: 1.3rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .sec-head p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 68ch;
+    font-size: 0.95rem;
+  }
+
+  /* --- Fragen-Karten --- */
+  .cards { display: flex; flex-direction: column; gap: 14px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 38px 1fr;
+    gap: 4px 16px;
+  }
+
+  /* Die Nummer ist eine Belegstelle, keine Reihenfolge: damit die IT
+     antworten kann "zu Punkt 4 sagen wir nein". */
+  .card__num {
+    grid-row: 1 / span 3;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--r-sm);
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .card__q {
+    margin: 0;
+    font-size: 1.06rem;
+    font-weight: 620;
+    line-height: 1.4;
+    align-self: center;
+    text-wrap: balance;
+  }
+  .card__why { margin: 8px 0 0; color: var(--muted); font-size: 0.95rem; max-width: 70ch; }
+  .card__why strong { color: var(--text); font-weight: 600; }
+  .card__tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .chip {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  .chip--block { color: var(--blocker); background: var(--blocker-bg); }
+  .chip--later { color: var(--later); background: var(--later-bg); }
+
+  code, .mono {
+    font-family: var(--mono);
+    font-size: 0.885em;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 1px 5px;
+    word-break: break-word;
+  }
+
+  /* --- Tabellen (Faktenblatt) --- */
+  .table-scroll { overflow-x: auto; border-radius: var(--r-md); }
+  table {
+    width: 100%;
+    min-width: 520px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    font-size: 0.94rem;
+  }
+  th {
+    text-align: left;
+    font-size: 11.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 650;
+    background: var(--surface-2);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td .note { display: block; color: var(--muted); font-size: 0.88rem; margin-top: 2px; }
+
+  /* --- Entscheidungs-Block (deine Seite) --- */
+  .decisions { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
+  .decision {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+    padding: 18px 20px;
+  }
+  .decision h3 {
+    margin: 0 0 4px;
+    font-size: 1.02rem;
+    font-weight: 640;
+  }
+  .decision .rec {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--ok);
+    font-weight: 620;
+    margin-bottom: 8px;
+  }
+  .decision p { margin: 0; color: var(--muted); font-size: 0.93rem; }
+
+  /* --- Merkposten --- */
+  .notes { display: flex; flex-direction: column; gap: 12px; }
+  .note-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+  }
+  .note-item h3 { margin: 0 0 4px; font-size: 1rem; font-weight: 640; }
+  .note-item p { margin: 0; color: var(--muted); font-size: 0.93rem; max-width: 74ch; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  @media (max-width: 560px) {
+    .card { grid-template-columns: 1fr; }
+    .card__num { grid-row: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<header class="head">
+  <div class="head__inner">
+    <p class="head__eyebrow">Vorbereitung Umzug · Stand 23.08.2026</p>
+    <h1>LagerHub auf den Firmenserver – was die IT beantworten muss</h1>
+    <p>
+      LagerHub ist die Aufgabenverwaltung fürs Lager: ein Dashboard für die Leitung und eine
+      Handy-App für die Mitarbeiter, beide in Echtzeit verbunden. Bisher läuft alles auf dem
+      Entwicklungsrechner mit einer Datenbank in der Cloud. Ziel ist der Betrieb auf einem
+      eigenen Server als vier Docker-Container.
+    </p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="sec-head">
+      <h2>Teil 1 · Fragen an die IT</h2>
+      <p>
+        Zehn Punkte. Die rot markierten brauche ich, bevor ich die Server-Konfiguration
+        fertigstellen kann – die anderen erst vor dem Livegang. Zu jedem steht, was daran hängt,
+        damit die IT die Folgen einschätzen kann statt nur ja oder nein zu sagen.
+      </p>
+    </div>
+
+    <div class="legend">
+      <span><span class="chip chip--block">blockiert</span> brauche ich jetzt</span>
+      <span><span class="chip chip--later">vor Livegang</span> kann später kommen</span>
+    </div>
+
+    <div class="cards">
+
+      <article class="card">
+        <div class="card__num">1</div>
+        <p class="card__q">Soll LagerHub aus dem Internet erreichbar sein oder nur im Firmennetz?</p>
+        <p class="card__why">
+          Das entscheidet alles Weitere. <strong>Nur intern</strong> heißt: Mitarbeiter kommen
+          unterwegs oder aus dem Mobilfunk nicht heran. Und ohne ein gültiges HTTPS-Zertifikat
+          gibt es <strong>keine Push-Benachrichtigungen aufs Handy</strong> und die App lässt sich
+          nicht als Symbol auf den Startbildschirm legen – Browser erlauben beides nur über eine
+          gesicherte Verbindung.
+          <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">2</div>
+        <p class="card__q">Welche Adressen bekommt das System, und wer trägt sie im DNS ein?</p>
+        <p class="card__why">
+          Ich brauche zwei Namen – einen fürs Dashboard, einen für die Mitarbeiter-App, etwa
+          <code>lager.firma.de</code> und <code>app.firma.de</code>. Beide müssen als DNS-Eintrag
+          auf den Server zeigen, sonst kann das Zertifikat nicht ausgestellt werden. Wichtig zu
+          wissen: Gibt es <strong>getrennte DNS-Zonen innen und außen</strong>? Dann muss der Name
+          in beiden stehen, sonst funktioniert er nur an einem der beiden Orte.
+          <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">3</div>
+        <p class="card__q">Darf Port 443 von außen auf den Server – und wenn nein, welchen Weg gibt es?</p>
+        <p class="card__why">
+          Für die automatische Zertifikatsausstellung über Let’s Encrypt genügt
+          <strong>443</strong>. <code>80</code> brauche ich nur, um Aufrufe ohne <code>https://</code>
+          umzuleiten. Ist von außen gar nichts erlaubt, geht es über einen DNS-Nachweis – dafür
+          braucht der Server jedoch <strong>Schreibzugriff auf die DNS-Zone per API-Schlüssel</strong>.
+          Wer könnte den bereitstellen?
+          <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">4</div>
+        <p class="card__q">Steht ein zentraler Proxy oder eine Filter-Firewall davor – und lässt die WebSockets durch?</p>
+        <p class="card__why">
+          Dashboard und Handy-App halten eine dauerhafte Verbindung offen (<code>/ws</code>), über
+          die Änderungen sofort ankommen. Zwei Dinge brechen das regelmäßig:
+          <strong>der HTTP-Upgrade wird nicht durchgereicht</strong>, oder ein
+          <strong>kurzer Leerlauf-Timeout</strong> kappt die stille Verbindung. Die App verbindet
+          sich zwar automatisch neu, aber im Minutentakt zu trennen macht die Echtzeit-Anzeige
+          wertlos. Falls es einen solchen Proxy gibt, brauche ich seinen Namen und wer ihn konfiguriert.
+          <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">5</div>
+        <p class="card__q">Darf der Server nach außen telefonieren – und wenn nur über einen Proxy, über welchen?</p>
+        <p class="card__why">
+          Vier Ziele, alle über <code>443</code>: die Zertifikatsstelle, die Push-Dienste von
+          Google, Mozilla und Apple (dorthin gehen die Handy-Benachrichtigungen), die
+          Zeiterfassung <code>api.crewmeister.com</code> und beim Bauen die Paketquellen. Die
+          vollständige Liste steht unten im Faktenblatt. Wenn der Server nur über einen
+          Unternehmens-Proxy ins Internet darf, brauche ich dessen Adresse.
+          <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">6</div>
+        <p class="card__q">In welchem Netz hängen die Handys der Lagermitarbeiter?</p>
+        <p class="card__why">
+          Viele Firmen-WLANs – und praktisch jedes Gäste-WLAN – trennen die Geräte voneinander
+          ab. Dann sieht das Handy den Server im selben Haus nicht. Ich muss wissen, welches
+          Netz die Geräte nutzen und ob von dort ein Zugriff auf den Server freigeschaltet ist.
+          <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">7</div>
+        <p class="card__q">Läuft der Server rund um die Uhr, und steht er auf deutscher Zeit?</p>
+        <p class="card__why">
+          Beides ist keine Kosmetik. LagerHub prüft <strong>jede Minute</strong>, ob Feierabend
+          ist, ob eine dringende Aufgabe zu lange liegen bleibt und ob alte Tagesjournale weg
+          können – ein nachts heruntergefahrener Server verpasst das. Und die Uhrzeiten rechnen
+          mit der <strong>lokalen Zeit des Servers</strong>: steht er auf UTC, unterbricht der
+          Feierabend im Sommer zwei Stunden zu spät und die Tagesauswertung schneidet die Tage
+          falsch. Gebraucht wird <code>Europe/Berlin</code> und eine Uhr, die per Zeitserver
+          nachgeführt wird.
+          <span class="card__tags"><span class="chip chip--block">blockiert</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">8</div>
+        <p class="card__q">Wer sichert die Datenbank, wie oft, wohin – und wurde eine Rückspielung schon einmal geprobt?</p>
+        <p class="card__why">
+          In der Datenbank liegt die gesamte Arbeitszeit-Historie: wer wie lange an welchem
+          Schritt gearbeitet hat. Das ist der einzige Teil des Systems, der sich nicht neu
+          aufbauen lässt – der Rest ist aus dem Quellcode jederzeit wiederherstellbar. Eine
+          Sicherung, die noch nie zurückgespielt wurde, zählt nicht.
+          <span class="card__tags"><span class="chip chip--later">vor Livegang</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">9</div>
+        <p class="card__q">Wer betreibt den Server im Alltag?</p>
+        <p class="card__why">
+          Konkret: Wer startet die Container nach einem Neustart oder Stromausfall (das erledigt
+          Docker selbst, wenn es so eingerichtet ist), wer spielt Betriebssystem-Updates ein, wer
+          merkt es, wenn der Dienst steht – und wer darf sich überhaupt auf dem Server anmelden?
+          <span class="card__tags"><span class="chip chip--later">vor Livegang</span></span>
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card__num">10</div>
+        <p class="card__q">Stellt die IT lieber ein eigenes Zertifikat bereit?</p>
+        <p class="card__why">
+          Falls es ein Wildcard-Zertifikat oder eine interne Zertifizierungsstelle gibt, nutze ich
+          das statt Let’s Encrypt. Ein Vorbehalt bei der internen Variante: <strong>das
+          Stammzertifikat muss auf jedem Mitarbeiter-Handy installiert sein</strong>, sonst
+          verweigert der Browser die Verbindung – und ohne akzeptierte Verbindung wieder kein Push.
+          <span class="card__tags"><span class="chip chip--later">vor Livegang</span></span>
+        </p>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Teil 2 · Faktenblatt für die IT</h2>
+      <p>
+        Das, was die IT wissen muss, um die Fragen oben beantworten zu können. Nach außen sichtbar
+        ist ein einziger Dienst; Datenbank und Zwischenspeicher bleiben im internen Docker-Netz und
+        bekommen keine Ports nach draußen.
+      </p>
+    </div>
+
+    <div class="table-scroll" style="margin-bottom: 18px;">
+      <table>
+        <thead>
+          <tr><th>Dienst</th><th>Aufgabe</th><th>Erreichbar</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Caddy</td>
+            <td>Web-Zugang, Zertifikate, verteilt auf die anderen<span class="note">holt und erneuert Let’s-Encrypt-Zertifikate selbstständig</span></td>
+            <td><strong>80, 443</strong><span class="note">einzige offene Ports</span></td>
+          </tr>
+          <tr>
+            <td>Backend</td>
+            <td>Node.js / Fastify – Programmlogik, WebSocket<span class="note">bedient <code>/api</code> und <code>/ws</code></span></td>
+            <td>3000<span class="note">nur intern</span></td>
+          </tr>
+          <tr>
+            <td>PostgreSQL</td>
+            <td>Datenbank – Aufgaben, Mitarbeiter, Arbeitszeit-Historie</td>
+            <td>5432<span class="note">nur intern, eigenes Volume</span></td>
+          </tr>
+          <tr>
+            <td>Redis</td>
+            <td>Verteilt Live-Ereignisse an die verbundenen Clients<span class="note">kein dauerhafter Datenbestand</span></td>
+            <td>6379<span class="note">nur intern</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-scroll" style="margin-bottom: 18px;">
+      <table>
+        <thead>
+          <tr><th>Ausgehende Verbindung</th><th>Wofür</th><th>Wann</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>acme-v02.api.letsencrypt.org</code>:443</td>
+            <td>Zertifikat holen und erneuern</td>
+            <td>alle 60 Tage</td>
+          </tr>
+          <tr>
+            <td>Push-Dienste der Browser-Hersteller:443<span class="note">u. a. <code>fcm.googleapis.com</code> (Chrome), <code>*.push.services.mozilla.com</code> (Firefox), <code>web.push.apple.com</code> (Safari)</span></td>
+            <td>Benachrichtigungen auf die Mitarbeiter-Handys</td>
+            <td>laufend</td>
+          </tr>
+          <tr>
+            <td><code>api.crewmeister.com</code>:443</td>
+            <td>Zeiterfassung: Anwesenheit und gestempelte Arbeitszeit</td>
+            <td>jede Minute</td>
+          </tr>
+          <tr>
+            <td><code>registry-1.docker.io</code>, <code>registry.npmjs.org</code>:443</td>
+            <td>Bausteine beim Erstellen der Container</td>
+            <td>nur beim Aufsetzen und bei Updates</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Anforderung</th><th>Wert</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Betriebssystem</td><td>Linux mit Docker und Docker Compose<span class="note">Windows Server ginge, kostet aber mehr Handarbeit</span></td></tr>
+          <tr><td>Rechenleistung</td><td>Richtwert 2 CPU-Kerne, 4 GB RAM<span class="note">Schätzung für ein Lagerteam – die Last ist gering</span></td></tr>
+          <tr><td>Speicherplatz</td><td>20 GB plus Wachstum der Historie</td></tr>
+          <tr><td>Zeitzone</td><td><code>Europe/Berlin</code>, Uhr per Zeitserver nachgeführt</td></tr>
+          <tr><td>Laufzeit</td><td>durchgehend, auch nachts<span class="note">siehe Frage 7</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Teil 3 · Entscheidungen bei dir, nicht bei der IT</h2>
+      <p>Vier Punkte, die ich von dir brauche – unabhängig davon, was die IT antwortet.</p>
+    </div>
+
+    <div class="decisions">
+      <article class="decision">
+        <h3>Die beiden Adressen</h3>
+        <span class="rec">Vorschlag: zwei getrennte Namen</span>
+        <p>
+          Dashboard und Handy-App bekommen je einen eigenen Namen. Unter einer gemeinsamen Adresse
+          mit Unterverzeichnis müsste ich die App umbauen, und der Teil, der die Push-Nachrichten
+          empfängt, ist dabei eine bekannte Fehlerquelle.
+        </p>
+      </article>
+
+      <article class="decision">
+        <h3>Die alten Daten</h3>
+        <span class="rec">Vorschlag: frisch anfangen</span>
+        <p>
+          Bisher war alles ein Testsystem. Ein Umzug der bestehenden Datenbank würde die alten
+          Probeläufe in die Auswertung des echten Betriebs mischen. Alternativ übernehme ich alles
+          per Datenbank-Abzug.
+        </p>
+      </article>
+
+      <article class="decision">
+        <h3>Das Betriebssystem</h3>
+        <span class="rec">Vorschlag: Linux (Ubuntu LTS)</span>
+        <p>
+          Der eingespielte Normalfall für Docker. Wenn bei euch ohnehin nur Windows Server
+          betrieben wird, geht das auch – dann beschreibe ich die Abweichungen in der Anleitung.
+        </p>
+      </article>
+
+      <article class="decision">
+        <h3>Der Zeitpunkt</h3>
+        <span class="rec">offen</span>
+        <p>
+          Wann soll umgestellt werden? Danach richtet sich, ob ich die Anleitung auf einen
+          begleiteten Umzug schreibe oder auf einen, den die IT allein durchführt.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Teil 4 · Nicht vergessen</h2>
+      <p>Drei Punkte, die keine IT-Frage sind, aber vor dem Livegang erledigt sein müssen.</p>
+    </div>
+
+    <div class="notes">
+      <article class="note-item">
+        <h3>Mitbestimmung und Datenschutz klären</h3>
+        <p>
+          LagerHub erfasst je Mitarbeiter, an welchem Schritt er wie lange gearbeitet hat, wie oft
+          er gewechselt hat und – zusammen mit der Zeiterfassung – wie viel Zeit keinem Schritt
+          zugeordnet ist. Das sind personenbezogene Leistungsdaten. Wenn es einen Betriebsrat oder
+          einen Datenschutzbeauftragten gibt, sollte das vor dem Start besprochen sein, nicht danach.
+        </p>
+      </article>
+
+      <article class="note-item">
+        <h3>Eigenes Konto für die Zeiterfassung</h3>
+        <p>
+          Der Zugriff auf Crewmeister sollte über einen technischen Benutzer laufen, nicht über ein
+          persönliches Konto – sonst steht das System still, sobald diese Person das Passwort
+          ändert oder das Unternehmen verlässt.
+        </p>
+      </article>
+
+      <article class="note-item">
+        <h3>Neue Zugangsgeheimnisse für den Produktivbetrieb</h3>
+        <p>
+          Der Server bekommt einen neuen Signierschlüssel für die Anmeldung und neue Admin-PINs.
+          Die bisherigen stammen aus der Entwicklung und gelten als verbraucht. Ich erzeuge sie
+          beim Aufsetzen; sie gehören ausschließlich in die Konfigurationsdatei auf dem Server.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    Zusammengestellt aus dem aktuellen Stand des Projekts. Sobald die rot markierten Punkte
+    beantwortet sind, erstelle ich die Server-Konfiguration (Docker-Dateien, Web-Zugang,
+    Umgebungsvorlage) und eine Schritt-für-Schritt-Anleitung für die Einrichtung.
+  </footer>
+
+</div>

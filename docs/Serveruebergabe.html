@@ -1,0 +1,911 @@
+<title>LagerHub Serverübergabe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* ---------------------------------------------------------------
+     Palette aus der LagerHub-Markenwelt (CLAUDE.md): Navy + Gold.
+     Regel von dort uebernommen: NIE Gold-Text auf Weiss - Gold nur
+     als Flaeche, Linie oder Rahmen, Text darauf immer Navy.
+     Neutrale sind leicht navy-gebrochen, kein reines Grau.
+     ---------------------------------------------------------------- */
+  :root {
+    --navy:        #212C3D;
+    --navy-700:    #2C3A50;
+    --navy-500:    #4A5A73;
+    --gold:        #EEC643;
+    --gold-soft:   #FBF0CC;
+
+    --ground:      #F5F7FA;
+    --surface:     #FFFFFF;
+    --surface-2:   #EDF1F6;
+    --line:        #D7DEE8;
+    --line-strong: #B9C4D3;
+
+    --ink:         #1B2432;
+    --ink-soft:    #55637A;
+    --ink-faint:   #7C8798;
+
+    --risk:        #A8322A;
+    --risk-bg:     #FBEDEC;
+    --done:        #14804A;
+    --done-bg:     #E7F3EC;
+
+    --r-sm: 4px;
+    --r-md: 8px;
+    --shadow: 0 1px 2px rgba(33,44,61,.06), 0 4px 14px rgba(33,44,61,.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --navy:        #0E141E;
+      --navy-700:    #182231;
+      --navy-500:    #93A2B8;
+      --gold:        #E8C051;
+      --gold-soft:   #332D14;
+
+      --ground:      #11161F;
+      --surface:     #1A2230;
+      --surface-2:   #212B3B;
+      --line:        #2E3A4C;
+      --line-strong: #435268;
+
+      --ink:         #E4E9F1;
+      --ink-soft:    #A9B5C7;
+      --ink-faint:   #7F8CA1;
+
+      --risk:        #F2938A;
+      --risk-bg:     #2E1A18;
+      --done:        #5FC08D;
+      --done-bg:     #13291F;
+
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 14px rgba(0,0,0,.28);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --navy:        #0E141E;
+    --navy-700:    #182231;
+    --navy-500:    #93A2B8;
+    --gold:        #E8C051;
+    --gold-soft:   #332D14;
+
+    --ground:      #11161F;
+    --surface:     #1A2230;
+    --surface-2:   #212B3B;
+    --line:        #2E3A4C;
+    --line-strong: #435268;
+
+    --ink:         #E4E9F1;
+    --ink-soft:    #A9B5C7;
+    --ink-faint:   #7F8CA1;
+
+    --risk:        #F2938A;
+    --risk-bg:     #2E1A18;
+    --done:        #5FC08D;
+    --done-bg:     #13291F;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 14px rgba(0,0,0,.28);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px 96px; }
+
+  /* ---------------- Kopf ---------------- */
+  .masthead {
+    background: linear-gradient(160deg, var(--navy-700), var(--navy));
+    border-bottom: 3px solid var(--gold);
+    color: #fff;
+    padding: 44px 0 38px;
+    margin-bottom: 44px;
+  }
+  .masthead .wrap { padding-bottom: 0; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(30px, 4.6vw, 44px);
+    line-height: 1.12;
+    letter-spacing: -.015em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+    color: #fff;
+  }
+  .standfirst {
+    max-width: 62ch;
+    color: #C9D3E2;
+    font-size: 17px;
+    margin: 0 0 26px;
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 8px 28px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12.5px;
+    color: #93A2B8;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,.12);
+  }
+  .meta b { color: #E4E9F1; font-weight: 500; }
+
+  /* ---------------- Typografie ---------------- */
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -.01em;
+    line-height: 1.25;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 16.5px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    letter-spacing: -.005em;
+  }
+  p { margin: 0 0 14px; max-width: 68ch; }
+  .lede { color: var(--ink-soft); max-width: 68ch; margin: 0 0 22px; }
+  a { color: var(--ink); text-underline-offset: 3px; }
+
+  section { margin-bottom: 52px; }
+
+  /* Abschnittskopf mit Phasennummer - die Reihenfolge ist echt:
+     ohne DNS kein Zertifikat, ohne Zertifikat keine Bindung. */
+  .sechead { display: flex; gap: 16px; align-items: baseline; margin-bottom: 18px; }
+  .phase {
+    flex: none;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px; font-weight: 500;
+    color: var(--navy);
+    background: var(--gold);
+    border-radius: var(--r-sm);
+    padding: 3px 8px;
+    letter-spacing: .06em;
+  }
+  .sechead .sub { color: var(--ink-faint); font-size: 14px; margin: 2px 0 0; }
+
+  code, .mono {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .88em;
+  }
+  p code, li code, td code, dd code {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: .08em .34em;
+    white-space: nowrap;
+  }
+
+  /* ---------------- Karten & Tabellen ---------------- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .panel + .panel { margin-top: 16px; }
+
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 520px; }
+  th {
+    text-align: left;
+    font-size: 11.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td .hint { display: block; color: var(--ink-soft); font-size: 13px; margin-top: 3px; }
+
+  /* Wer ist zustaendig - in einer Uebergabe die wichtigste Spalte */
+  .who {
+    display: inline-block;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px; letter-spacing: .05em;
+    padding: 2px 7px; border-radius: var(--r-sm);
+    white-space: nowrap;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    color: var(--ink-soft);
+  }
+  .who--it   { background: var(--gold-soft); color: var(--ink); box-shadow: inset 0 0 0 1px var(--gold); }
+  .who--done { background: var(--done-bg); color: var(--done); box-shadow: inset 0 0 0 1px currentColor; }
+
+  /* ---------------- Diagramm ---------------- */
+  .stack { display: grid; gap: 0; margin: 0; }
+  .node {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+    box-shadow: var(--shadow);
+  }
+  .node--edge { border-style: dashed; box-shadow: none; background: var(--surface-2); }
+  .node__title { font-weight: 600; font-size: 15px; margin: 0 0 2px; }
+  .node__meta {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12.5px; color: var(--ink-soft); margin: 0;
+  }
+  .node ul { margin: 8px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--ink-soft); }
+  .node li { margin-bottom: 2px; }
+  .link {
+    justify-self: start;
+    margin-left: 30px;
+    border-left: 2px solid var(--line-strong);
+    padding: 8px 0 8px 16px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: .03em;
+  }
+  .out {
+    margin-top: 14px;
+    border-left: 2px dashed var(--line-strong);
+    margin-left: 30px;
+    padding: 8px 0 4px 16px;
+  }
+  .out p { margin: 0 0 4px; font-size: 13.5px; color: var(--ink-soft); max-width: none; }
+
+  /* ---------------- Hinweiskasten ---------------- */
+  .callout {
+    border-radius: var(--r-md);
+    padding: 16px 18px;
+    margin: 0 0 16px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .callout--risk { background: var(--risk-bg); border-color: var(--risk); }
+  .callout--gold { background: var(--gold-soft); border-color: var(--gold); }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout__label {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
+    font-weight: 500; margin: 0 0 6px;
+  }
+  .callout--risk .callout__label { color: var(--risk); }
+  .callout--gold .callout__label { color: var(--ink-soft); }
+
+  /* ---------------- Kommandos ---------------- */
+  pre {
+    margin: 0;
+    padding: 16px 18px;
+    background: var(--navy);
+    color: #DCE3EE;
+    border-radius: var(--r-md);
+    overflow-x: auto;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 13px;
+    line-height: 1.75;
+    border: 1px solid var(--line-strong);
+  }
+  pre .c { color: #8496AF; }
+  pre .g { color: var(--gold); }
+
+  /* ---------------- Checkliste ---------------- */
+  .check { list-style: none; margin: 0; padding: 0; }
+  .check li { border-bottom: 1px solid var(--line); }
+  .check li:last-child { border-bottom: none; }
+  .check label {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 12px 16px;
+    cursor: pointer;
+  }
+  .check label:hover { background: var(--surface-2); }
+  .check input { margin: 5px 0 0; width: 16px; height: 16px; accent-color: var(--navy-500); }
+  .check .t { font-size: 14.5px; }
+  .check .d { display: block; color: var(--ink-soft); font-size: 13px; margin-top: 2px; }
+  .check input:checked + .t { color: var(--ink-faint); text-decoration: line-through; }
+  .check input:checked + .t .d { text-decoration: none; }
+
+  .progress {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 12px 16px;
+    background: var(--surface-2); border-bottom: 1px solid var(--line);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12.5px; color: var(--ink-soft);
+  }
+
+  dl.vars { margin: 0; }
+  .foot {
+    margin-top: 56px; padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint); font-size: 13.5px;
+  }
+
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: var(--r-sm); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  @media (max-width: 640px) {
+    .wrap { padding: 0 16px 64px; }
+    .link, .out { margin-left: 16px; }
+  }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Übergabe an die IT</p>
+    <h1>LagerHub auf dem Windows Server</h1>
+    <p class="standfirst">
+      Was der Server braucht, damit die Lager-Aufgabenverwaltung dort im Firmennetz läuft.
+      Die Anwendung selbst ist fertig und läuft bereits unter Windows — es geht ausschließlich
+      um die Einrichtung.
+    </p>
+    <div class="meta">
+      <span><b>Stand</b> 7. September 2026</span>
+      <span><b>Betrieb</b> rein intern, keine Erreichbarkeit aus dem Internet</span>
+      <span><b>Ansprechpartner</b> Andreas Funke</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <h2>Worum es geht</h2>
+    <p class="lede">
+      LagerHub verteilt Arbeitsaufträge an das Lagerteam: Das Büro legt Aufgaben mit einzelnen
+      Arbeitsschritten an, die Mitarbeiter holen sich die Schritte am Handy und melden sie fertig.
+      Alle Beteiligten sehen Änderungen sofort, ohne die Seite neu zu laden.
+    </p>
+    <p>
+      Technisch sind es <strong>drei Teile</strong>: ein Node.js-Dienst mit der Programmlogik, ein
+      Web-Dashboard für Büro und Leitung, und eine Handy-App für das Lager. Dashboard und Handy-App
+      sind reine Dateien — HTML, JavaScript, Bilder —, die ein Webserver ausliefert. Nur der
+      Node-Dienst läuft dauerhaft.
+    </p>
+    <div class="callout callout--gold">
+      <p class="callout__label">Kurz gesagt</p>
+      <p>
+        Ein Windows-Dienst, eine IIS-Website mit zwei Adressen, ein Zertifikat, eine Datenbank.
+        Kein Docker, kein Linux, keine Freigabe aus dem Internet.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <h2>Der Server im Überblick</h2>
+    </div>
+    <div class="stack">
+      <div class="node node--edge">
+        <p class="node__title">Mitarbeiter-Handys und Büro-PCs</p>
+        <p class="node__meta">im Firmennetz bzw. Hallen-WLAN</p>
+      </div>
+      <div class="link">↓ &nbsp;HTTPS, Port 443</div>
+
+      <div class="node">
+        <p class="node__title">IIS</p>
+        <p class="node__meta">zwei Adressen auf denselben Server</p>
+        <ul>
+          <li><span class="mono">lagerhub.firma.de</span> — liefert das Dashboard aus</li>
+          <li><span class="mono">app.firma.de</span> — liefert die Handy-App aus</li>
+          <li>beide reichen <span class="mono">/api</span> und <span class="mono">/ws</span> an den Node-Dienst weiter</li>
+        </ul>
+      </div>
+      <div class="link">↓ &nbsp;nur lokal, localhost:3000</div>
+
+      <div class="node">
+        <p class="node__title">LagerHub-Dienst</p>
+        <p class="node__meta">Node.js, hört auf Port 3000 — von außen nicht erreichbar</p>
+      </div>
+      <div class="link">↓ &nbsp;lokal</div>
+
+      <div class="node">
+        <p class="node__title">PostgreSQL</p>
+        <p class="node__meta">auf demselben Server, als Windows-Dienst</p>
+      </div>
+
+      <div class="out">
+        <p><strong>Ausgehend</strong> vom Server ins Internet — sonst nichts:</p>
+        <p>→ <span class="mono">api.crewmeister.com</span> (Zeiterfassung)</p>
+        <p>→ Push-Dienste der Handy-Hersteller (Benachrichtigungen)</p>
+        <p>→ Let's Encrypt und euer DNS-Anbieter (Zertifikatserneuerung)</p>
+      </div>
+    </div>
+    <p style="margin-top:20px">
+      Die Adressen sind Beispiele — welche Namen es werden, entscheidet ihr. Wichtig ist nur, dass
+      es <strong>zwei</strong> sind und beide intern auf die private IP des Servers zeigen.
+    </p>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="phase">Schritt 1</span>
+      <div>
+        <h2>Was auf den Server gehört</h2>
+        <p class="sub">Bevor irgendetwas eingerichtet wird</p>
+      </div>
+    </div>
+    <div class="panel scroll">
+      <table>
+        <thead>
+          <tr><th>Komponente</th><th>Anforderung</th><th>Wozu</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Node.js</strong></td>
+            <td class="mono">Version 22 oder neuer</td>
+            <td>Führt den LagerHub-Dienst aus<span class="hint">LTS-Version genügt, keine Zusatzmodule nötig</span></td>
+          </tr>
+          <tr>
+            <td><strong>IIS</strong></td>
+            <td>mit <span class="mono">URL Rewrite</span>, <span class="mono">Application Request Routing</span> und dem Windows-Feature <span class="mono">WebSocket Protocol</span></td>
+            <td>Liefert die Dateien aus und leitet an den Dienst weiter<span class="hint">Ohne das WebSocket-Feature funktioniert die Live-Aktualisierung nicht — siehe Risiken</span></td>
+          </tr>
+          <tr>
+            <td><strong>PostgreSQL</strong></td>
+            <td>Version 16 oder neuer, offizieller Windows-Installer</td>
+            <td>Die Datenbank<span class="hint">Läuft als normaler Windows-Dienst, kein Docker</span></td>
+          </tr>
+          <tr>
+            <td><strong>win-acme</strong></td>
+            <td>aktuelle Version</td>
+            <td>Holt und erneuert das Zertifikat<span class="hint">Trägt es selbst in die IIS-Bindung ein und legt eine geplante Aufgabe für die Erneuerung an</span></td>
+          </tr>
+          <tr>
+            <td><strong>Dienst-Werkzeug</strong></td>
+            <td>NSSM oder ein gleichwertiges</td>
+            <td>Macht aus dem Node-Programm einen Windows-Dienst<span class="hint">Damit er beim Neustart automatisch hochkommt und sich nach einem Absturz selbst neu startet</span></td>
+          </tr>
+          <tr>
+            <td><strong>Zeitzone</strong></td>
+            <td class="mono">Europe/Berlin (W. Europe Standard Time)</td>
+            <td>Nicht optional — siehe Risiken</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="phase">Schritt 2</span>
+      <div>
+        <h2>Netzwerk und Freigaben</h2>
+        <p class="sub">Nach innen offen, nach außen fast dicht</p>
+      </div>
+    </div>
+
+    <div class="panel scroll">
+      <table>
+        <thead>
+          <tr><th>Richtung</th><th>Was</th><th>Nötig, weil</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="who who--it">eingehend</span></td>
+            <td><strong>443/TCP aus dem Firmennetz</strong><span class="hint">Nur intern. Aus dem Internet muss nichts erreichbar sein.</span></td>
+            <td>Die Mitarbeiter greifen zu</td>
+          </tr>
+          <tr>
+            <td><span class="who">ausgehend</span></td>
+            <td><span class="mono">api.crewmeister.com:443</span></td>
+            <td>Anwesenheit aus der Zeiterfassung<span class="hint">Fehlt die Verbindung, merkt LagerHub nicht, wenn jemand ausstempelt — die laufende Arbeit wird dann nicht angehalten</span></td>
+          </tr>
+          <tr>
+            <td><span class="who">ausgehend</span></td>
+            <td><strong>Push-Dienste der Browser-Hersteller</strong><span class="hint">fcm.googleapis.com (Chrome, Android), web.push.apple.com (iPhone), updates.push.services.mozilla.com (Firefox)</span></td>
+            <td>Benachrichtigungen aufs Handy<span class="hint">Die genaue Adresse hängt am Browser des jeweiligen Geräts</span></td>
+          </tr>
+          <tr>
+            <td><span class="who">ausgehend</span></td>
+            <td><strong>Let's Encrypt und euer DNS-Anbieter</strong></td>
+            <td>Zertifikat alle 90 Tage erneuern</td>
+          </tr>
+          <tr>
+            <td><span class="who">ausgehend</span></td>
+            <td><span class="mono">registry.npmjs.org</span><span class="hint">Nur beim Bauen. Alternativ bauen wir woanders und liefern die fertigen Dateien.</span></td>
+            <td>Programmbibliotheken laden</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout--risk" style="margin-top:16px">
+      <p class="callout__label">Bitte bei der WLAN-Planung berücksichtigen</p>
+      <p>
+        Benachrichtigungen gehen nicht direkt vom Server aufs Handy. Der Server schickt sie an den
+        Push-Dienst des Handy-Herstellers, und das Handy holt sie von dort über seine eigene
+        Verbindung ab. <strong>Beide Seiten brauchen also Internet.</strong> Ist das Hallen-WLAN
+        vollständig abgeschottet und haben die Geräte keine SIM-Karte, kommt keine Benachrichtigung
+        an — die App selbst funktioniert dann weiterhin vollständig, aber eben nur, solange sie
+        offen ist.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="phase">Schritt 3</span>
+      <div>
+        <h2>Adressen und Zertifikat</h2>
+        <p class="sub">Der Teil, der zuerst stehen muss</p>
+      </div>
+    </div>
+    <p>
+      Wir brauchen zwei Namen aus einer Domain, die der Firma gehört — zum Beispiel
+      <span class="mono">lagerhub.firma.de</span> und <span class="mono">app.firma.de</span>. Beide
+      zeigen im <strong>internen</strong> DNS auf die private IP des Servers. Nach außen wird nichts
+      veröffentlicht.
+    </p>
+    <p>
+      Das Zertifikat holt <strong>win-acme</strong> über die <span class="mono">DNS-01</span>-Prüfung:
+      Der Nachweis läuft über einen DNS-Eintrag statt über einen offenen Port, es genügt also eine
+      ausgehende Verbindung. Ein Zertifikat für beide Namen reicht.
+    </p>
+    <div class="callout callout--gold">
+      <p class="callout__label">Warum dieser Umweg</p>
+      <p>
+        Ein selbst ausgestelltes Zertifikat würde hier nicht genügen: Handys verweigern bei einem
+        nicht vertrauenswürdigen Zertifikat die Installation als App und die Benachrichtigungen.
+        Ein Zertifikat aus einer internen Zertifizierungsstelle müsste auf jedem einzelnen Handy
+        von Hand eingerichtet werden — und bei jedem neuen Gerät erneut. Der Weg über einen echten
+        Namen erspart das vollständig: Jedes Handy vertraut ihm sofort.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="phase">Schritt 4</span>
+      <div>
+        <h2>IIS einrichten</h2>
+        <p class="sub">Zwei Websites, dieselbe Struktur</p>
+      </div>
+    </div>
+    <p>
+      Beide Websites sind gleich aufgebaut. Sie unterscheiden sich nur im Hostnamen und im Ordner
+      mit den Dateien:
+    </p>
+    <div class="panel scroll">
+      <table>
+        <thead>
+          <tr><th>Website</th><th>Dateien liegen in</th><th>Weiterleitung</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Dashboard</strong><span class="hint mono">lagerhub.firma.de</span></td>
+            <td class="mono">…\LagerHub\frontend\dist</td>
+            <td rowspan="2">
+              <span class="mono">/api</span> und <span class="mono">/ws</span> →
+              <span class="mono">http://localhost:3000</span>
+              <span class="hint">
+                Alles andere kommt aus dem Dateiordner. Anfragen auf einen unbekannten Pfad müssen
+                auf <span class="mono">index.html</span> zeigen, sonst führt ein Neuladen innerhalb
+                der App zu einem 404.
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Handy-App</strong><span class="hint mono">app.firma.de</span></td>
+            <td class="mono">…\LagerHub\pwa\dist</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:16px">
+      <p class="callout__label">Die Regeln sind schon fertig</p>
+      <p>
+        In beiden Ordnern liegt nach dem Bauen eine <span class="mono">web.config</span>. Sie bringt
+        die Weiterleitung, den Fallback auf <span class="mono">index.html</span>, die fehlenden
+        Dateitypen und die Zwischenspeicher-Regeln bereits mit — es muss also nichts von Hand in
+        IIS eingetragen werden. Sie wird beim Bauen automatisch mitgeliefert und kann nicht
+        vergessen werden.
+      </p>
+      <p>
+        Zwei Dinge stehen trotzdem nicht darin, weil sie am Server hängen und nicht an der Website:
+        das Windows-Feature <span class="mono">WebSocket Protocol</span> und der eingeschaltete
+        Proxy in ARR (IIS-Manager → Server → <span class="mono">Application Request Routing Cache</span>
+        → <span class="mono">Server Proxy Settings</span> → <span class="mono">Enable proxy</span>).
+        Ohne den zweiten Punkt antwortet <span class="mono">/api</span> mit 404.
+      </p>
+    </div>
+
+    <div class="callout callout--risk" style="margin-top:16px">
+      <p class="callout__label">Bitte einmal prüfen: kommt die echte Client-Adresse an?</p>
+      <p>
+        LagerHub bremst Anmeldeversuche <strong>pro Adresse</strong> aus (zehn pro Minute) — die PIN
+        ist vierstellig, ohne diese Bremse wäre sie zu raten. Dafür muss der Dienst die Adresse des
+        Geräts sehen, nicht die des Servers. IIS reicht sie im Feld
+        <span class="mono">X-Forwarded-For</span> weiter.
+      </p>
+      <p>
+        Kommt sie <em>nicht</em> an, sieht der Dienst jede Anfrage als
+        <span class="mono">127.0.0.1</span> — dann teilen sich <strong>alle Mitarbeiter einen
+        gemeinsamen Zähler</strong> und ab der zehnten Anmeldung im Haus wird jede weitere
+        abgewiesen. Ein Blick ins Protokoll nach den ersten Anmeldungen beantwortet das sofort.
+      </p>
+    </div>
+
+    <div class="callout callout--risk" style="margin-top:16px">
+      <p class="callout__label">Das würde ich als Allererstes prüfen</p>
+      <p>
+        Die Weiterleitung von <span class="mono">/ws</span> ist eine <strong>WebSocket</strong>-Verbindung,
+        keine gewöhnliche Anfrage. Dafür muss das Windows-Feature <span class="mono">WebSocket Protocol</span>
+        installiert und die Zwischenspeicherung in ARR für diesen Pfad abgeschaltet sein.
+      </p>
+      <p>
+        Daran hängt die gesamte Live-Aktualisierung: Ohne sie sehen Dashboard und Handy-App
+        Änderungen erst beim Neuladen der Seite. Die Anwendung wirkt dann nicht kaputt, nur
+        merkwürdig träge — deshalb fällt es erfahrungsgemäß erst im Betrieb auf. Ein kurzer Test
+        direkt nach dem Einrichten spart hier viel Sucherei.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="phase">Schritt 5</span>
+      <div>
+        <h2>Bauen und starten</h2>
+        <p class="sub">Einmal einrichten, danach bei jeder neuen Version wiederholen</p>
+      </div>
+    </div>
+    <pre><span class="c"># Dienst: Abhängigkeiten, Datenbankstruktur, Programm bauen</span>
+cd backend
+npm ci
+npx prisma generate
+npx prisma migrate deploy      <span class="c"># legt die Tabellen an bzw. aktualisiert sie</span>
+npm run build
+
+<span class="c"># Dashboard und Handy-App bauen (Ergebnis landet je in dist\)</span>
+cd ..\frontend &amp;&amp; npm ci &amp;&amp; npm run build
+cd ..\pwa      &amp;&amp; npm ci &amp;&amp; npm run build
+
+<span class="c"># Dienst starten - im Betrieb übernimmt das der Windows-Dienst</span>
+cd ..\backend
+npm start                      <span class="g"># hört auf Port 3000</span></pre>
+    <p style="margin-top:16px">
+      Der Dienst wird mit NSSM auf <span class="mono">node dist\index.js</span> im Ordner
+      <span class="mono">backend</span> eingerichtet, mit automatischem Start und Neustart nach
+      einem Absturz. Ob er läuft, beantwortet
+      <span class="mono">http://localhost:3000/health</span> — die Antwort lautet
+      <span class="mono">{"ok":true}</span> und eignet sich direkt für eure Überwachung.
+    </p>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="phase">Schritt 6</span>
+      <div>
+        <h2>Einstellungen</h2>
+        <p class="sub">Datei <span class="mono">backend\.env</span> — gehört nicht in die Versionsverwaltung</p>
+      </div>
+    </div>
+    <div class="panel scroll">
+      <table class="vars">
+        <thead>
+          <tr><th>Eintrag</th><th>Bedeutung</th><th>Wer setzt ihn</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">DATABASE_URL<span class="hint mono" style="white-space:normal">DIRECT_URL</span></td>
+            <td>Zugang zur Datenbank<span class="hint">Beide zeigen auf die lokale PostgreSQL</span></td>
+            <td><span class="who who--it">IT</span></td>
+          </tr>
+          <tr>
+            <td class="mono">JWT_SECRET</td>
+            <td>Schlüssel für die Anmeldung<span class="hint">Langer Zufallswert. Pflicht — ohne ihn startet der Dienst absichtlich nicht. Wird er später geändert, müssen sich alle neu anmelden.</span></td>
+            <td><span class="who who--it">IT</span></td>
+          </tr>
+          <tr>
+            <td class="mono">ADMIN_PINS</td>
+            <td>Zugangs-PINs für die Vollansicht<span class="hint">Format <span class="mono">1234:Name</span>, mehrere mit Komma. Diese PINs gehören keinem Mitarbeiter-Datensatz an.</span></td>
+            <td><span class="who who--it">IT</span></td>
+          </tr>
+          <tr>
+            <td class="mono">CORS_ORIGIN</td>
+            <td>Erlaubte Adressen<span class="hint">Die beiden Hostnamen, mit Komma getrennt</span></td>
+            <td><span class="who who--it">IT</span></td>
+          </tr>
+          <tr>
+            <td class="mono">NODE_ENV</td>
+            <td>fest auf <span class="mono">production</span></td>
+            <td><span class="who who--it">IT</span></td>
+          </tr>
+          <tr>
+            <td class="mono">VAPID_PUBLIC_KEY<span class="hint mono" style="white-space:normal">VAPID_PRIVATE_KEY<br>VAPID_SUBJECT</span></td>
+            <td>Schlüsselpaar für Benachrichtigungen<span class="hint">Einmalig erzeugen mit <span class="mono">npx web-push generate-vapid-keys</span>. Danach nicht mehr ändern — sonst müssen alle Mitarbeiter die Benachrichtigungen neu einschalten.</span></td>
+            <td><span class="who who--it">IT</span></td>
+          </tr>
+          <tr>
+            <td class="mono">CREWMEISTER_*</td>
+            <td>Zugangsdaten der Zeiterfassung<span class="hint">Benutzer, Passwort und Crew-Nummer</span></td>
+            <td><span class="who">Fachbereich</span></td>
+          </tr>
+          <tr>
+            <td class="mono">PORT</td>
+            <td><span class="mono">3000</span>, nur lokal gebunden</td>
+            <td><span class="who who--done">voreingestellt</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px">
+      Eine ausgefüllte Vorlage für genau diesen Server liegt im Projekt unter
+      <span class="mono">backend\.env.production.example</span> — auf dem Server nach
+      <span class="mono">backend\.env</span> kopieren und die Platzhalter ersetzen. Sie enthält
+      zusätzlich <span class="mono">TZ=Europe/Berlin</span>: eine zweite Absicherung der Zeitzone
+      für den Fall, dass die Einstellung des Servers doch einmal abweicht.
+    </p>
+  </section>
+
+  <section>
+    <h2>Die drei Dinge, die erfahrungsgemäß schiefgehen</h2>
+    <p class="lede">Alle drei sind leicht zu vermeiden und schwer zu finden, wenn man sie übersieht.</p>
+
+    <div class="callout callout--risk">
+      <p class="callout__label">1 — Zeitzone</p>
+      <p>
+        Der Server <strong>muss</strong> auf <span class="mono">Europe/Berlin</span> stehen.
+        LagerHub rechnet an mehreren Stellen mit der lokalen Uhrzeit: Feierabend, Mittagspause,
+        die Erinnerung zum Arbeitsbeginn und die Tagesgrenze der Auswertungen. Läuft der Server auf
+        UTC, unterbricht der Feierabend im Sommer zwei Stunden zu spät und die Tagesberichte
+        schneiden an der falschen Stelle.
+      </p>
+    </div>
+
+    <div class="callout callout--risk">
+      <p class="callout__label">2 — WebSocket durch IIS</p>
+      <p>
+        Siehe Schritt 4. Ohne das Windows-Feature <span class="mono">WebSocket Protocol</span>
+        bleibt die Live-Aktualisierung stumm, ohne dass eine Fehlermeldung erscheint.
+      </p>
+      <p>
+        Eine Nebenwirkung ist inzwischen abgefangen: Die Verbindung ist die meiste Zeit still, weil
+        Meldungen nur kommen, wenn wirklich etwas passiert. Ein Proxy trennt eine stille Verbindung
+        nach einer Weile. LagerHub schickt deshalb alle zwanzig Sekunden ein Lebenszeichen und lädt
+        nach einem Abriss den Stand neu nach — vorher hätte die Anzeige stillschweigend veralten
+        können. Das ersetzt das Windows-Feature aber nicht.
+      </p>
+    </div>
+
+    <div class="callout callout--risk">
+      <p class="callout__label">3 — Datensicherung</p>
+      <p>
+        Die Datenbank enthält die gesamte Auftrags- und Arbeitszeit-Historie. Für PostgreSQL ist
+        <span class="mono">pg_dump</span> als geplante Aufgabe der übliche Weg. Bitte mit einplanen —
+        eine Sicherung, die nie zurückgespielt wurde, ist keine.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Was <em>nicht</em> gebraucht wird</h2>
+    <p class="lede">Damit niemand danach sucht — diese Punkte standen in einer früheren Planung und sind erledigt.</p>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Nicht nötig</th><th>Warum nicht</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Docker</strong></td><td>Alle drei Teile laufen direkt unter Windows</td></tr>
+          <tr><td><strong>Linux-Server</strong></td><td>Ebenso — es gibt keine Linux-Abhängigkeit</td></tr>
+          <tr><td><strong>Redis</strong></td><td>Wurde entfernt. Die Live-Aktualisierung läuft jetzt innerhalb des Node-Dienstes<span class="hint">Das gilt, solange genau ein Dienst läuft. Bei zwei parallelen Instanzen bitte vorher Rücksprache.</span></td></tr>
+          <tr><td><strong>Erreichbarkeit aus dem Internet</strong></td><td>Der Betrieb ist rein intern</td></tr>
+          <tr><td><strong>Cloud-Datenbank</strong></td><td>PostgreSQL läuft auf demselben Server</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Checkliste</h2>
+    <p class="lede">Zum Abhaken. Der Stand bleibt in diesem Browser gespeichert.</p>
+    <div class="panel">
+      <div class="progress">
+        <span id="progress-text">0 von 16 erledigt</span>
+        <button type="button" id="reset" style="font:inherit;background:none;border:1px solid var(--line-strong);color:var(--ink-soft);border-radius:4px;padding:2px 10px;cursor:pointer">zurücksetzen</button>
+      </div>
+      <ul class="check" id="check">
+        <li><label><input type="checkbox"><span class="t">Zeitzone auf <span class="mono">Europe/Berlin</span> gestellt<span class="d">Vor allem anderen — beeinflusst Arbeitszeiten und Auswertungen</span></span></label></li>
+        <li><label><input type="checkbox"><span class="t">Node.js 22 oder neuer installiert</span></label></li>
+        <li><label><input type="checkbox"><span class="t">PostgreSQL installiert, leere Datenbank angelegt</span></label></li>
+        <li><label><input type="checkbox"><span class="t">IIS installiert, dazu URL Rewrite und ARR</span></label></li>
+        <li><label><input type="checkbox"><span class="t">Windows-Feature <span class="mono">WebSocket Protocol</span> aktiviert</span></label></li>
+        <li><label><input type="checkbox"><span class="t">Zwei interne DNS-Namen zeigen auf den Server</span></label></li>
+        <li><label><input type="checkbox"><span class="t">Zertifikat über win-acme geholt und gebunden<span class="d">Erneuerung als geplante Aufgabe eingerichtet</span></span></label></li>
+        <li><label><input type="checkbox"><span class="t">Ausgehende Freigaben gesetzt<span class="d">Crewmeister, Push-Dienste, Let's Encrypt</span></span></label></li>
+        <li><label><input type="checkbox"><span class="t">Port 443 aus dem Firmennetz erreichbar</span></label></li>
+        <li><label><input type="checkbox"><span class="t"><span class="mono">.env</span> ausgefüllt<span class="d">Neues JWT_SECRET, neue Admin-PINs, VAPID-Schlüssel, Crewmeister-Zugang</span></span></label></li>
+        <li><label><input type="checkbox"><span class="t">Alle drei Teile gebaut, Datenbankstruktur angelegt</span></label></li>
+        <li><label><input type="checkbox"><span class="t">Node als Windows-Dienst eingerichtet<span class="d">Automatischer Start, Neustart nach Absturz</span></span></label></li>
+        <li><label><input type="checkbox"><span class="t">ARR-Proxy eingeschaltet<span class="d">Server Proxy Settings → Enable proxy. Ohne das antwortet /api mit 404</span></span></label></li>
+        <li><label><input type="checkbox"><span class="t">WebSocket-Verbindung geprüft<span class="d">Änderung an einem Gerät erscheint sofort am anderen</span></span></label></li>
+        <li><label><input type="checkbox"><span class="t">Echte Client-Adresse kommt an<span class="d">Sonst teilen sich alle Mitarbeiter die Anmelde-Bremse — siehe Schritt 4</span></span></label></li>
+        <li><label><input type="checkbox"><span class="t">Datensicherung der Datenbank eingerichtet und einmal zurückgespielt</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Offene Punkte</h2>
+    <div class="panel scroll">
+      <table>
+        <thead><tr><th>Punkt</th><th>Bei wem</th></tr></thead>
+        <tbody>
+          <tr><td>Welche zwei Hostnamen werden es?<span class="hint">Und liegt die Verwaltung der Domain bei euch?</span></td><td><span class="who who--it">IT</span></td></tr>
+          <tr><td>Bekommen die Handys im Hallen-WLAN Internetzugang?<span class="hint">Entscheidet, ob Benachrichtigungen ankommen</span></td><td><span class="who who--it">IT</span></td></tr>
+          <tr><td>Wer richtet die Datensicherung ein, und wie oft?</td><td><span class="who who--it">IT</span></td></tr>
+          <tr><td>Personalbezogene Auswertungen<span class="hint">LagerHub wertet Arbeitszeiten je Mitarbeiter aus — Betriebsrat und Datenschutz sollten das kennen</span></td><td><span class="who">Fachbereich</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="foot">
+    Fragen zur Anwendung selbst gerne direkt an mich. Die technische Dokumentation liegt im
+    Projektordner unter <span class="mono">CLAUDE.md</span>, die Vorlage der Einstellungen unter
+    <span class="mono">backend\.env.production.example</span>.
+  </p>
+</div>
+
+<script>
+  (function () {
+    var boxes = Array.prototype.slice.call(document.querySelectorAll("#check input"));
+    var out = document.getElementById("progress-text");
+    // Der Stand haengt an der Position in der Liste. Kommen Punkte dazu,
+    // verschieben sich die Positionen - ein alter Stand landete dann auf den
+    // falschen Zeilen. Deshalb bei jeder Aenderung der Liste den Schluessel
+    // hochzaehlen: lieber leer als still falsch.
+    var KEY = "lagerhub-uebergabe-check-v2";
+
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { return []; }
+    }
+    function write(v) {
+      try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* Privatmodus o. Ä. */ }
+    }
+    function paint() {
+      var n = boxes.filter(function (b) { return b.checked; }).length;
+      out.textContent = n + " von " + boxes.length + " erledigt";
+    }
+
+    var saved = read();
+    boxes.forEach(function (b, i) {
+      b.checked = saved.indexOf(i) !== -1;
+      b.addEventListener("change", function () {
+        write(boxes.reduce(function (acc, box, j) {
+          if (box.checked) acc.push(j);
+          return acc;
+        }, []));
+        paint();
+      });
+    });
+    document.getElementById("reset").addEventListener("click", function () {
+      boxes.forEach(function (b) { b.checked = false; });
+      write([]);
+      paint();
+    });
+    paint();
+  })();
+</script>

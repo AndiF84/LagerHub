@@ -1,0 +1,370 @@
+<title>LagerHub Übergabe-Paket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Palette wie in den übrigen Übergabe-Dokumenten (Navy + Gold aus der
+     LagerHub-Markenwelt). Gold nie als Text auf Weiß – nur Fläche und Linie. */
+  :root {
+    --navy: #212C3D; --navy-700: #2C3A50; --navy-500: #4A5A73;
+    --gold: #EEC643; --gold-soft: #FBF0CC;
+    --ground: #F5F7FA; --surface: #FFFFFF; --surface-2: #EDF1F6;
+    --line: #D7DEE8; --line-strong: #B9C4D3;
+    --ink: #1B2432; --ink-soft: #55637A; --ink-faint: #7C8798;
+    --risk: #A8322A; --risk-bg: #FBEDEC;
+    --done: #14804A; --done-bg: #E7F3EC;
+    --r-sm: 4px; --r-md: 8px;
+    --shadow: 0 1px 2px rgba(33,44,61,.06), 0 4px 14px rgba(33,44,61,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --navy: #0E141E; --navy-700: #182231; --navy-500: #93A2B8;
+      --gold: #E8C051; --gold-soft: #332D14;
+      --ground: #11161F; --surface: #1A2230; --surface-2: #212B3B;
+      --line: #2E3A4C; --line-strong: #435268;
+      --ink: #E4E9F1; --ink-soft: #A9B5C7; --ink-faint: #7F8CA1;
+      --risk: #F2938A; --risk-bg: #2E1A18;
+      --done: #5FC08D; --done-bg: #13291F;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 14px rgba(0,0,0,.28);
+    }
+  }
+  :root[data-theme="dark"] {
+    --navy: #0E141E; --navy-700: #182231; --navy-500: #93A2B8;
+    --gold: #E8C051; --gold-soft: #332D14;
+    --ground: #11161F; --surface: #1A2230; --surface-2: #212B3B;
+    --line: #2E3A4C; --line-strong: #435268;
+    --ink: #E4E9F1; --ink-soft: #A9B5C7; --ink-faint: #7F8CA1;
+    --risk: #F2938A; --risk-bg: #2E1A18;
+    --done: #5FC08D; --done-bg: #13291F;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 14px rgba(0,0,0,.28);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px; line-height: 1.62; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 96px; }
+
+  .masthead {
+    background: linear-gradient(160deg, var(--navy-700), var(--navy));
+    border-bottom: 3px solid var(--gold);
+    color: #fff; padding: 44px 0 38px; margin-bottom: 44px;
+  }
+  .masthead .wrap { padding-bottom: 0; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--gold); margin: 0 0 14px;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600;
+    font-size: clamp(28px, 4.4vw, 40px); line-height: 1.15; margin: 0 0 14px;
+  }
+  .lede { font-size: 18px; color: #C9D3E2; margin: 0; max-width: 62ch; }
+
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600;
+    font-size: 24px; margin: 52px 0 6px; padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+  h2 .num {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px;
+    color: var(--ink-faint); display: block; margin-bottom: 4px; font-weight: 400;
+  }
+  h3 { font-size: 16px; margin: 28px 0 6px; }
+  p { margin: 12px 0; max-width: 74ch; }
+  .sub { color: var(--ink-soft); font-size: 15px; margin-top: 2px; }
+
+  table { border-collapse: separate; border-spacing: 0; width: 100%; margin: 18px 0; font-size: 15px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    font-size: 12px; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--ink-soft); background: var(--surface-2); font-weight: 600;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  .tbl { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow); }
+  .tbl table { margin: 0; }
+
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 13.5px; }
+  code { background: var(--surface-2); padding: 1px 5px; border-radius: var(--r-sm); }
+  pre {
+    background: var(--navy); color: #E6ECF5; padding: 18px 20px;
+    border-radius: var(--r-md); overflow-x: auto; font-size: 13.5px; line-height: 1.7;
+  }
+  pre .c { color: #93A2B8; }
+
+  .box { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--gold);
+         border-radius: var(--r-md); padding: 16px 20px; margin: 22px 0; box-shadow: var(--shadow); }
+  .box h3 { margin-top: 0; }
+  .box--risk { border-left-color: var(--risk); background: var(--risk-bg); }
+  .box--done { border-left-color: var(--done); background: var(--done-bg); }
+
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 20px 0; }
+  ol.steps li {
+    counter-increment: s; position: relative; padding: 0 0 0 44px; margin-bottom: 18px;
+  }
+  ol.steps li::before {
+    content: counter(s); position: absolute; left: 0; top: 1px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--gold); color: var(--navy);
+    font-family: "IBM Plex Mono", monospace; font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+  }
+  ol.steps li strong { display: block; }
+
+  a { color: var(--navy-500); }
+  @media (prefers-color-scheme: dark) { a { color: var(--gold); } }
+  .foot { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--line);
+          color: var(--ink-soft); font-size: 15px; }
+</style>
+
+<div class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Übergabe-Paket · bitte zuerst lesen</p>
+    <h1>LagerHub auf den Server bringen</h1>
+    <p class="lede">
+      Auf diesem Stick liegt alles, was für die Einrichtung gebraucht wird: das
+      fertig gebaute Programm, der Quellcode und die drei Dokumente, die den
+      Rest erklären. Diese Seite sagt nur, was wo liegt und in welcher
+      Reihenfolge man vorgeht.
+    </p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <h2><span class="num">Schritt 1</span>Was auf dem Stick liegt</h2>
+  <p class="sub">Vier Dinge, mehr nicht.</p>
+
+  <div class="tbl">
+    <table>
+      <thead>
+        <tr><th style="width:34%">Ordner / Datei</th><th>Was es ist</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="mono">LIESMICH.html</span></td>
+          <td>Diese Seite.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">Doku\</span></td>
+          <td>
+            Die drei Dokumente: <strong>Serveruebergabe</strong> (die
+            vollständige Beschreibung), <strong>Installationstag</strong> (der
+            Ablauf am Einrichtungstag), <strong>IT-Abstimmung</strong> (die
+            Fragen, die vorher geklärt sein sollten).
+          </td>
+        </tr>
+        <tr>
+          <td><span class="mono">LagerHub\</span></td>
+          <td>
+            Das Programm. Dieser Ordner kommt <strong>unverändert</strong> auf
+            den Server, zum Beispiel nach <span class="mono">C:\LagerHub</span>.
+            Er enthält das fertig Gebaute <em>und</em> den Quellcode.
+          </td>
+        </tr>
+        <tr>
+          <td><span class="mono">PAKET-INFO.txt</span></td>
+          <td>Wann das Paket erzeugt wurde und aus welchem Programmstand.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box box--done">
+    <h3>Es ist fertig gebaut — der Server braucht dafür kein Internet</h3>
+    <p style="margin-bottom:0">
+      Die Programmbibliotheken liegen mit im Paket
+      (<span class="mono">backend\node_modules</span>). Der Schritt
+      <span class="mono">npm ci</span> aus der Übergabe-Doku
+      <strong>entfällt damit</strong>, ebenso
+      <span class="mono">npm run build</span>. Auch
+      <span class="mono">npm run migrate:deploy</span> läuft ohne
+      Netzverbindung, weil das Prisma-Werkzeug bereits enthalten ist.
+      Ausgehendes Internet bleibt trotzdem für den <em>Betrieb</em> nötig —
+      Zeiterfassung, Benachrichtigungen und Zertifikatserneuerung. Die genauen
+      Adressen stehen in der Serverübergabe unter „Netzwerk und Freigaben".
+    </p>
+    <p style="margin-bottom:0">
+      <strong>Bitte <span class="mono">npm ci</span> hier wirklich nicht ausführen.</strong>
+      Der Befehl <strong>löscht <span class="mono">node_modules</span> als Erstes</strong> und
+      lädt neu aus dem Internet — ohne Netz bricht er ab und der mitgelieferte Baum ist weg.
+      Danach startet der Dienst nicht mehr und es kommt auch keine Datenbankverbindung
+      zustande. Dasselbe gilt für Meldungen über neuere Versionen: Prisma weist bei jedem
+      Aufruf darauf hin, das ist <strong>kein Arbeitsauftrag</strong>. Aktualisiert wird beim
+      Entwickler, nie auf dem Server.
+    </p>
+  </div>
+
+  <h2><span class="num">Schritt 2</span>In welcher Reihenfolge</h2>
+
+  <ol class="steps">
+    <li>
+      <strong>IT-Abstimmung lesen — vor dem Termin.</strong>
+      Darin stehen die Punkte, die von eurer Seite entschieden werden müssen:
+      die beiden Hostnamen, der Internetzugang im Hallen-WLAN, die
+      Datensicherung. Ohne die beiden Namen kann am Installationstag nichts
+      eingerichtet werden.
+    </li>
+    <li>
+      <strong>Serveruebergabe lesen — das ist die eigentliche Beschreibung.</strong>
+      Voraussetzungen, Freigaben, Zertifikat, IIS, Einstellungen. Sie enthält
+      auch den Abschnitt „Die drei Dinge, die erfahrungsgemäß schiefgehen".
+    </li>
+    <li>
+      <strong>Installationstag als Ablaufplan verwenden.</strong>
+      Die Schritte in der Reihenfolge, in der sie am Termin abgearbeitet werden,
+      mit Häkchen zum Abhaken.
+    </li>
+  </ol>
+
+  <div class="box box--risk">
+    <h3>Die Datei <span class="mono">backend\.env</span> ist schon da — bitte nicht überschreiben</h3>
+    <p>
+      Sie liegt fertig unter
+      <span class="mono">LagerHub\backend\.env</span> und ist auf Anweisung des
+      Betreibers <strong>weitgehend ausgefüllt</strong>. Enthalten sind die
+      <strong>Zugangs-PINs für die Vollansicht</strong>, die
+      <strong>Schlüssel für die Benachrichtigungen</strong>, der
+      <strong>Zugang zur Zeiterfassung</strong> und ein beim Packen frisch
+      erzeugtes <span class="mono">JWT_SECRET</span>.
+    </p>
+    <p>
+      Die PINs sind wichtiger, als sie aussehen: Nach der Installation ist die
+      Datenbank leer, es gibt noch keinen einzigen Mitarbeiter — diese PINs sind
+      die <strong>einzige Tür ins System</strong> und der einzige Weg, die ersten
+      Mitarbeiter anzulegen. Alles zusammen steht im <strong>Klartext</strong> in
+      der Datei, und der Zugang zur Zeiterfassung gehört dazu: Der Stick öffnet
+      damit auch ein fremdes System mit den Arbeitszeiten aller Mitarbeiter.
+      Entsprechend gehört er nicht in die Schublade, sondern nach der
+      Installation gelöscht oder weggeschlossen.
+    </p>
+    <p style="margin-bottom:0">
+      <strong>Offen sind nur noch zwei Werte:</strong> das
+      <strong>Datenbank-Kennwort</strong> in
+      <span class="mono">DATABASE_URL</span>/<span class="mono">DIRECT_URL</span>
+      (das aus dem <span class="mono">CREATE USER</span>) und
+      <span class="mono">CORS_ORIGIN</span>, sobald die beiden Website-Adressen
+      feststehen. Beides ist oben in der Datei selbst vermerkt.
+      <span class="mono">npm run db:check</span> prüft danach die Verbindung und
+      sagt im Klartext, falls etwas fehlt. Die Vorlage
+      <span class="mono">.env.production.example</span> liegt nur zum Vergleich
+      daneben — sie <em>nicht</em> über die <span class="mono">.env</span>
+      kopieren, sonst sind alle vorbelegten Werte weg.
+    </p>
+  </div>
+
+  <h2><span class="num">Schritt 3</span>Was nicht auf dem Stick liegt</h2>
+  <p class="sub">Und warum das so gewollt ist.</p>
+
+  <div class="tbl">
+    <table>
+      <thead>
+        <tr><th style="width:30%">Fehlt</th><th>Grund</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Zertifikate</td>
+          <td>
+            Das Entwicklungs-Zertifikat gilt nur für den Entwicklungsrechner.
+            Auf dem Server holt <strong>win-acme</strong> ein echtes.
+          </td>
+        </tr>
+        <tr>
+          <td>Die Versionsgeschichte</td>
+          <td>
+            In alten Ständen stecken abgelaufene Zugangs-PINs. Der aktuelle
+            Quellcode liegt vollständig bei, die Historie bleibt beim Entwickler.
+          </td>
+        </tr>
+        <tr>
+          <td>Installationsprogramme</td>
+          <td>
+            Node.js, PostgreSQL und die IIS-Erweiterungen sollten aus euren
+            eigenen, geprüften Quellen kommen — nicht von einem fremden Stick.
+            Die Liste steht gleich unten.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Diese fünf Dinge bringt die IT selbst mit</h3>
+
+  <div class="tbl">
+    <table>
+      <thead>
+        <tr><th style="width:26%">Was</th><th style="width:22%">Version</th><th>Bezug</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Node.js</td><td>22 LTS oder neuer</td><td><span class="mono">nodejs.org</span> — MSI für Windows x64</td></tr>
+        <tr><td>PostgreSQL</td><td>16 oder neuer</td><td><span class="mono">postgresql.org/download/windows</span> — der offizielle Installer, kein Docker</td></tr>
+        <tr><td>IIS <span class="mono">URL Rewrite</span> und <span class="mono">Application Request Routing</span></td><td>aktuell</td><td><span class="mono">iis.net/downloads</span> — beide nötig, ARR muss danach als Proxy eingeschaltet werden</td></tr>
+        <tr><td>NSSM</td><td>aktuell</td><td><span class="mono">nssm.cc</span> — macht aus dem Programm einen Windows-Dienst</td></tr>
+        <tr><td>win-acme</td><td>aktuell</td><td><span class="mono">win-acme.com</span> — holt und erneuert das Zertifikat</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    Dazu kommt das Windows-Feature <strong>WebSocket Protocol</strong> — das ist
+    keine Installation, sondern ein Häkchen im Server-Manager. Ohne dieses
+    Häkchen wirkt die Anwendung nicht kaputt, sondern nur merkwürdig träge, und
+    genau deshalb fällt es erst im Betrieb auf.
+  </p>
+
+  <h2><span class="num">Schritt 4</span>Kurzfassung für Eilige</h2>
+  <p class="sub">
+    Die vollständige Fassung steht in der Serverübergabe. Diese hier ist nur die
+    Gedächtnisstütze, wenn alles Vorbereitende steht.
+  </p>
+
+<pre><span class="c"># Ordner LagerHub\ vom Stick nach C:\LagerHub kopieren</span>
+
+<span class="c"># 1. Datenbank: Rolle und Datenbank "lagerhub" anlegen (siehe Doku)</span>
+<span class="c"># 2. C:\LagerHub\backend\.env oeffnen und die Platzhalter ersetzen.</span>
+<span class="c">#    Die Datei ist bereits da - NICHT durch die .example ersetzen,</span>
+<span class="c">#    die Zugangs-PINs stehen schon darin.</span>
+
+<span class="c"># 3. Tabellen anlegen</span>
+cd C:\LagerHub\backend
+npx prisma migrate deploy
+
+<span class="c"># 4. Probelauf - muss {"ok":true} liefern</span>
+npm start
+<span class="c">#    im zweiten Fenster:  curl http://localhost:3000/health</span>
+
+<span class="c"># 5. Als Windows-Dienst einrichten (NSSM), Startordner C:\LagerHub\backend,</span>
+<span class="c">#    Programm: node dist\index.js</span>
+
+<span class="c"># 6. Zwei IIS-Websites anlegen, Wurzeln:</span>
+<span class="c">#      Dashboard:  C:\LagerHub\frontend\dist</span>
+<span class="c">#      Handy-App:  C:\LagerHub\pwa\dist</span>
+<span class="c">#    Die web.config liegt in beiden Ordnern bereits fertig.</span></pre>
+
+  <div class="box box--risk">
+    <h3>Zwei Dinge bitte gleich nach dem Einrichten prüfen</h3>
+    <p>
+      <strong>Kommt die echte Geräte-Adresse an?</strong> LagerHub bremst
+      Anmeldeversuche pro Adresse aus. Sieht der Dienst wegen einer fehlenden
+      Weitergabe jede Anfrage als <span class="mono">127.0.0.1</span>, teilen
+      sich alle Mitarbeiter einen gemeinsamen Zähler — und ab der zehnten
+      Anmeldung im Haus wird jede weitere abgewiesen.
+    </p>
+    <p style="margin-bottom:0">
+      <strong>Steht die Live-Verbindung?</strong> Nach dem Einloggen an zwei
+      Geräten muss eine Änderung am einen sofort am anderen sichtbar sein, ohne
+      Neuladen. Wenn nicht, fehlt das WebSocket-Feature oder die
+      Zwischenspeicherung in ARR ist für diesen Pfad noch aktiv.
+    </p>
+  </div>
+
+  <p class="foot">
+    Fragen zur Anwendung selbst gerne direkt an mich. Die technische
+    Dokumentation für spätere Änderungen liegt im Projektordner unter
+    <span class="mono">CLAUDE.md</span>.
+  </p>
+
+</div>

@@ -1,0 +1,1164 @@
+/* Farbwelt abgeleitet von inter-drive.de: Navy (#212C3D) + Gold (#EEC643).
+   Navy = Marken-/Kopffarbe & Primär-Buttons, Gold = Akzent (aktiver Tab,
+   Kopf-Akzentlinie). Status-/Semantik-Farben (grün/rot/amber) bleiben.
+
+   Aufbau: erst Tokens (Farbe, Abstand, Radius, Schatten), dann Basis, dann
+   Bausteine. Tiefe entsteht über abgestufte Schatten statt harter Rahmen –
+   Rahmen bleiben, sind aber zurückgenommen, damit Tabellen ruhig wirken. */
+:root {
+  --brand: #212c3d; /* Navy – Marken-Grundton */
+  --brand-700: #1a2431; /* dunkler (Hover auf Navy) */
+  --brand-600: #2c3b50; /* heller Navy */
+  --accent: #eec643; /* Gold – Akzent */
+  --accent-600: #d7ad2d; /* dunkleres Gold (Rahmen/Hover) */
+  --accent-soft: #fbf1cf; /* helles Gold (Flächen) */
+  --on-accent: #212c3d; /* Text auf Gold */
+
+  --bg: #e9edf3;
+  --card: #ffffff;
+  --text: #212c3d;
+  --muted: #6b7280;
+  --border: #e3e5e8;
+  --border-strong: #d3d7dd; /* Rahmen auf Bedienelementen (etwas kräftiger) */
+  --hover: #f3f5f8; /* Hover-Fläche auf hellem Grund */
+
+  /* Radius-Skala: klein = Bedienelemente, mittel = Karten, groß = Kopf/Dialoge */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+
+  /* Schatten-Skala – bewusst weich und flach, damit nichts "schwebt" */
+  --sh-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --sh-sm: 0 1px 3px rgba(16, 24, 40, 0.07), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --sh-md: 0 4px 12px rgba(16, 24, 40, 0.08), 0 2px 4px rgba(16, 24, 40, 0.04);
+  --sh-lg: 0 12px 32px rgba(16, 24, 40, 0.12), 0 4px 8px rgba(16, 24, 40, 0.05);
+
+  /* Fokus-Ring: einheitlich für Tastaturbedienung (Barrierefreiheit) */
+  --ring: 0 0 0 3px rgba(33, 44, 61, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tastatur-Fokus überall sichtbar, Maus-Klick bleibt ruhig. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: var(--r-sm);
+}
+
+.app {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 18px 18px 48px;
+}
+.content {
+  padding-bottom: 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand) 60%);
+  color: #fff;
+  padding: 16px 20px;
+  border-radius: var(--r-lg);
+  border-bottom: 3px solid var(--accent);
+  box-shadow: var(--sh-md);
+  margin-bottom: 6px;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo__mark {
+  display: block;
+  flex: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+.logo__word {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  color: #fff;
+}
+.logo__name {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+/* Kleiner Urheber-Schriftzug unter der Wortmarke; bewusst dezent (gedämpftes
+   Weiß) und ohne das Gold-Akzent-„Hub" zu überstrahlen. */
+.logo__by {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.6);
+}
+/* „Andinsky" als kleine Gold-Signatur (das „by" bleibt gedämpft). */
+.logo__by-accent {
+  color: var(--accent);
+  font-weight: 600;
+}
+.logo__accent {
+  color: var(--accent); /* Gold auf Navy – kontraststark */
+}
+.header .muted {
+  color: rgba(255, 255, 255, 0.72);
+}
+/* Buttons auf dem Navy-Kopf: transparente Fläche statt weißer Kachel. */
+.header .btn {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: none;
+}
+.header .btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+/* Punkt + Text kommen aus dem Markup (App.tsx), hier nur Typografie/Farbe. */
+.conn {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* Auf dem Navy-Kopf hellere Statusfarben für lesbaren Kontrast. */
+.conn--open {
+  color: #4ade80;
+}
+.conn--connecting {
+  color: #fbbf24;
+}
+.conn--closed {
+  color: #f87171;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  margin: 16px 0 18px;
+}
+.tab {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-size: 15px;
+  cursor: pointer;
+  color: #5b6270;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tab:hover {
+  background: var(--hover);
+  color: var(--brand);
+}
+/* Aktiver Tab: Gold-Unterlinie als 2px-Balken, bündig auf der Trennlinie. */
+.tab--active {
+  color: var(--brand);
+  font-weight: 600;
+}
+.tab--active::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: var(--sh-xs);
+}
+
+/* Aufgaben-Karte im Dashboard: trägt bewusst mehr Gewicht als ihre Innen-
+   Trennlinien und steht weiter auseinander als die Schritte darin – gleiche
+   Staffelung wie in der PWA (pwa/src/styles.css, .task-card). */
+.task-card {
+  border-color: var(--border-strong);
+  box-shadow: var(--sh-md);
+  margin-bottom: 20px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+/* Zeile ohne Auseinanderziehen: Elemente bleiben links gepackt. Nötig überall
+   dort, wo Inhalte je nach Zustand erscheinen/verschwinden – mit
+   space-between springen die verbleibenden Felder sonst quer über die Breite,
+   sobald ein langer Nachbar (z. B. ein Hinweistext) wegfällt. */
+.row--start {
+  justify-content: flex-start;
+}
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Überschriften: kompakter als die Browser-Vorgaben, damit Karten nicht
+   auseinanderfallen. Inline-Styles einzelner Komponenten gewinnen weiterhin. */
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+}
+h2 {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+}
+h3 {
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0 0 8px;
+}
+
+table {
+  width: 100%;
+  /* separate + border-spacing:0 statt collapse: nur so greift border-radius auf der
+     Tabelle. overflow:hidden klippt die eckigen Kopf-/Fußzeilen-Ecken weg. */
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+th,
+td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+/* Spaltenköpfe klein und gesperrt – hebt sie ohne kräftige Farbe ab. */
+th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* Ziffern in Tabellenzellen gleich breit → Zahlenspalten fluchten. */
+td {
+  font-variant-numeric: tabular-nums;
+}
+tbody tr {
+  transition: background 0.12s ease;
+}
+tbody tr:hover {
+  background: var(--hover);
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+select,
+input,
+button,
+textarea {
+  font-size: 14px;
+  font-family: inherit;
+}
+button {
+  cursor: pointer;
+}
+/* Einheitliche Felder: gleicher Rahmen/Radius wie Buttons, Fokus in Navy.
+   Checkbox/Radio ausgenommen – die behalten ihr natives Aussehen (sonst
+   bekämen sie Rahmen und Innenabstand und würden zu großen Kacheln). */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: #fff;
+  color: var(--text);
+  padding: 7px 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--brand-600);
+  box-shadow: var(--ring);
+}
+/* Anwesenheits-Schalter: Navy statt Browser-Blau für den Haken. */
+input[type="checkbox"] {
+  accent-color: var(--brand);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.btn {
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  color: var(--text);
+  border-radius: var(--r-sm);
+  padding: 7px 14px;
+  font-weight: 500;
+  box-shadow: var(--sh-xs);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease,
+    box-shadow 0.15s ease;
+}
+.btn:hover {
+  background: var(--hover);
+  border-color: #c2c7cf;
+}
+/* Leichter Druckpunkt beim Klicken – wirkt direkter als reiner Farbwechsel. */
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+}
+.btn--primary {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  box-shadow: var(--sh-sm);
+}
+.btn--primary:hover {
+  background: var(--brand-700);
+  border-color: var(--brand-700);
+}
+
+/* Excel-Export (Statistik/Auswertung). Grün wie die Tabellenkalkulation, die
+   dahinter steckt – bewusst NICHT die Marken-Palette, damit der Export sich
+   von den übrigen Bedienelementen abhebt und man ihn nicht suchen muss.
+   Der Ton ist der dunkle Grünwert des Fortschrittsbalkens (#14804a, 5:1 auf
+   Weiß = AA), nicht das hellere Erledigt-Grün: darauf wäre weißer Text zu blass.
+   Feste Mindestbreite, damit alle Export-Buttons gleich groß bleiben und beim
+   Wechsel der Ansicht (Alle ↔ einzelner MA) nicht die Breite ändern. */
+.btn--excel {
+  /* Reserve über der längsten Beschriftung ("⬇ Excel: Tagesübersicht", ~190 px),
+     damit auch bei größerer Systemschrift keiner aus der Reihe fällt. */
+  min-width: 220px;
+  background: #14804a;
+  border-color: #14804a;
+  color: #fff;
+  box-shadow: var(--sh-sm);
+}
+.btn--excel:hover:not(:disabled) {
+  background: #106b3e;
+  border-color: #106b3e;
+}
+/* Deaktiviert (keine Daten im Zeitraum): matt statt grün, sonst lockt die
+   Signalfarbe zu einem Klick, der nichts tut. */
+.btn--excel:disabled {
+  background: #fff;
+  border-color: var(--border-strong);
+  color: var(--text);
+  box-shadow: none;
+}
+
+/* Meldungs-Banner (z. B. abgelehnte Zuweisung im Dashboard).
+   Farbiger Balken links = Art der Meldung auf einen Blick. */
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--r-sm);
+  margin-bottom: 10px;
+  font-size: 14px;
+  box-shadow: var(--sh-xs);
+}
+.alert--warn {
+  background: #fdf6e6;
+  color: #8a5d00;
+  border: 1px solid #f2dda6;
+  border-left: 3px solid #e0a500;
+}
+.alert--info {
+  background: #eff5fd;
+  color: #1d4e89;
+  border: 1px solid #c5dcf7;
+  border-left: 3px solid #2f6fbd;
+}
+.alert__close {
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: inherit;
+  padding: 0 4px;
+  border-radius: 6px;
+  opacity: 0.65;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+.alert__close:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Fortschrittsbalken (Dashboard-Aufgaben) */
+.progress {
+  position: relative;
+  height: 8px;
+  background: #e4e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  flex: 1;
+  min-width: 120px;
+}
+.progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #16a34a, #14804a);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+/* Tagesjournal: ein abgeschlossener Durchlauf (components/JournalRunCard.tsx,
+   genutzt im Dashboard und in der Historie). Die Kopfzeile ist ein festes
+   Spaltenraster, damit Aufgabe / Uhrzeit / Dauer / Mitarbeiter über alle
+   Durchläufe hinweg untereinander fluchten. Vorher lief sie über .row
+   (flex + space-between): dabei zog jede Zeile ihre Felder je nach Textlänge
+   auseinander – die Mitarbeiter klebten am rechten Rand, der Rest schwamm. */
+.journal-run {
+  border-top: 1px solid var(--border);
+  padding: 8px 0;
+}
+.journal-run__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 52px 88px minmax(0, 1.3fr);
+  align-items: center;
+  gap: 8px;
+}
+/* Lange Namen kürzen statt umbrechen – sonst wächst die Zeile in die Höhe und
+   das Raster verliert seine Ruhe (voller Text steckt im title-Attribut). */
+.journal-run__task,
+.journal-run__people {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.journal-run__time,
+.journal-run__duration {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Schmale Fenster: Uhrzeit/Dauer/Mitarbeiter unter den Aufgabennamen, aber
+   weiter an dessen Spaltenkante ausgerichtet. */
+@media (max-width: 720px) {
+  .journal-run__head {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 2px;
+  }
+  .journal-run__time {
+    grid-column: 2;
+  }
+  .journal-run__duration,
+  .journal-run__people {
+    grid-column: 2;
+  }
+}
+
+/* Kebab-Menü (⋯) für Aufgaben-Aktionen */
+.menu {
+  position: relative;
+  display: inline-block;
+}
+.menu__trigger {
+  padding: 5px 10px;
+  line-height: 1;
+  font-size: 18px;
+}
+.menu__dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  min-width: 158px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-lg);
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+}
+/* Variante für Menüs, die per Portal am <body> hängen (components/KebabMenu.tsx):
+   in einer Tabellenzelle würde das `overflow: hidden` der Tabelle (nötig für deren
+   abgerundete Ecken) ein absolut positioniertes Menü abschneiden. Deshalb fixed,
+   ohne Ankerregeln – top/left setzt die Komponente aus dem Auslöser-Rechteck. */
+.menu__dropdown--float {
+  position: fixed;
+  right: auto;
+  top: auto;
+  z-index: 100;
+}
+.menu__item {
+  border: none;
+  background: none;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text);
+  transition: background 0.12s ease;
+}
+.menu__item:hover {
+  background: var(--hover);
+}
+.menu__item--danger {
+  color: #b42318;
+}
+.menu__item--danger:hover {
+  background: #fdf2f1;
+}
+.menu__item:disabled {
+  color: #9aa0a6;
+  cursor: default;
+}
+.menu__item:disabled:hover {
+  background: none;
+}
+
+/* Badges: weiche Pille mit dünnem Ring – ruhiger als Vollfläche, aber
+   klar unterscheidbar. Semantik der Farben bleibt unverändert. */
+.badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.badge--HIGH {
+  background: #fdeceb;
+  color: #b42318;
+  box-shadow: inset 0 0 0 1px #f6cdc9;
+}
+.badge--MEDIUM {
+  background: #fdf4e3;
+  color: #8a5d00;
+  box-shadow: inset 0 0 0 1px #f2ddab;
+}
+.badge--LOW {
+  background: #eef0f3;
+  color: #475467;
+  box-shadow: inset 0 0 0 1px #dfe3e8;
+}
+.badge--ACTIVE,
+.badge--RUNNING,
+.badge--active {
+  background: #e6f5ec;
+  color: #14804a;
+  box-shadow: inset 0 0 0 1px #bfe5cf;
+}
+.badge--OPEN {
+  background: #eaeeff;
+  color: #3730a3;
+  box-shadow: inset 0 0 0 1px #ccd4fb;
+}
+.badge--PAUSED {
+  background: #fdf4e3;
+  color: #8a5d00;
+  box-shadow: inset 0 0 0 1px #f2ddab;
+}
+.badge--WAITING {
+  background: #fdefdc;
+  color: #b45309;
+  box-shadow: inset 0 0 0 1px #f6d5a8;
+}
+.badge--DONE,
+.badge--COMPLETED {
+  background: #eef0f3;
+  color: #475467;
+  box-shadow: inset 0 0 0 1px #dfe3e8;
+}
+.badge--LOCKED,
+.badge--free {
+  background: #f2f4f6;
+  color: var(--muted);
+  box-shadow: inset 0 0 0 1px #e5e8ec;
+}
+
+/* Alter eines Arbeitsschritts ("⏱ 42 min") neben dem Status-Badge.
+   Bewusst KEINE zweite Pille: der Status ist die Aussage, das Alter die
+   Fußnote dazu – als Pille würden beide um dieselbe Aufmerksamkeit ringen.
+   Deshalb nur Text, und Farbe erst, wenn sie etwas bedeutet.
+   Ampel-Stufen aus Settings.escalationMins (siehe lib/stepAge.ts). */
+.step-age {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  /* Gleich breite Ziffern: sonst wandert die Zahl bei jedem Minutenwechsel. */
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+/* Halbe Schwelle erreicht – gleiche Amber-Semantik wie badge--PAUSED. */
+.step-age--warn {
+  color: #8a5d00;
+  font-weight: 600;
+}
+/* Schwelle überschritten = das, worauf auch die Eskalation feuert. */
+.step-age--over {
+  color: #b42318;
+  font-weight: 600;
+}
+
+/* Mitarbeiter-Spalte einer Schritt-Zeile im Dashboard (tabs/PoolTab.tsx).
+   Sind mehrere MA auf einem Schritt, steht jeder auf einer eigenen Zeile.
+   Zwei-Spalten-Raster: Spalte 1 = Namen, Spalte 2 = Schaltflächen – beide
+   fluchten damit über alle Zeilen. Die Namensspalte ist max-content, richtet
+   sich also nach dem LÄNGSTEN Namen; eine feste Breite wäre entweder zu knapp
+   oder ließe eine Lücke. Kein rechtsbündiges Schieben: die Tabelle ist
+   width:100%, die Schaltflächen würden sonst weit vom Namen wegwandern.
+   Vorher liefen die Einträge als inline-flex nebeneinander um und brachen je
+   nach Namenslänge irgendwo um – dabei fluchtete nichts. */
+.assignees {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: start;
+  align-items: center;
+  gap: 6px 10px;
+}
+/* Ohne start behielte die Pille nicht ihre eigene Breite, sondern würde auf
+   die Spaltenbreite (= längster Name) gedehnt. */
+.assignee__name {
+  justify-self: start;
+}
+.assignee__actions {
+  display: flex;
+  gap: 4px;
+}
+/* Gleiche Breite für "Unterbrechen"/"Fortsetzen"/"Erledigt": sonst verschiebt
+   der unterschiedlich lange Text die Nachbar-Schaltfläche von Zeile zu Zeile. */
+.assignee__actions .btn {
+  min-width: 118px;
+}
+/* Angebots-Zeile: ✓/✗ bleiben klein. */
+.assignee__actions--icons .btn {
+  min-width: 36px;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+  box-shadow: var(--sh-xs);
+}
+/* Kennzahl groß und in Navy, Ziffern gleich breit → Werte fluchten
+   untereinander, auch wenn sie sich live ändern. */
+.kpi__value {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+  font-variant-numeric: tabular-nums;
+}
+.kpi__label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* Anwesenheits-Schiebeschalter: grün = anwesend, rot = abwesend. */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle__track {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #e5484d; /* rot = abwesend */
+  transition: background 0.18s ease;
+}
+.toggle input:checked + .toggle__track {
+  background: #30a46c; /* grün = anwesend */
+}
+.toggle input:focus-visible + .toggle__track {
+  box-shadow: var(--ring);
+}
+.toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toggle input:checked ~ .toggle__thumb {
+  transform: translateX(20px);
+}
+.toggle input:disabled + .toggle__track {
+  opacity: 0.5;
+}
+
+/* Dashboard-Anmeldung (PIN) */
+.login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  /* Sanfter Navy-Schimmer am oberen Rand statt flächigem Grau. */
+  background: radial-gradient(120% 80% at 50% 0%, #e8ecf3 0%, var(--bg) 60%);
+}
+.login__card {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  padding: 26px 24px;
+}
+
+/* PIN-Eingabe + Buttons des Logins – identisch zur PWA (pwa/src/styles.css),
+   nur der Fokus-Rahmen nutzt hier --brand-600 (Navy), da --accent im Dashboard
+   Gold ist. Ersetzt die früheren Inline-Styles am Input/Button. */
+.pin-input {
+  width: 100%;
+  margin: 10px 0 14px;
+  padding: 14px;
+  font-size: 28px;
+  letter-spacing: 12px;
+  text-align: center;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.pin-input:focus {
+  outline: none;
+  border-color: var(--brand-600);
+  box-shadow: var(--ring);
+}
+.btn--block {
+  width: 100%;
+}
+.error {
+  color: var(--bad);
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+/* Pflichtnotiz beim Abschluss (NoteRequirementFields im Aufgaben-Tab).
+   Die drei Felder gehören zusammen – Format und Beschriftung sind ohne die
+   Checkbox wirkungslos. Deshalb ein eigener Block statt drei loser Elemente:
+   aus gilt als eine unauffällige graue Zeile, an bekommt die Gold-Kante, die
+   der MA später beim Abschluss wiedersieht. */
+.note-req {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  /* Weiß statt Grau: der Block sitzt einmal auf der weißen Karte (Anlegen) und
+     einmal auf dem grauen Grund der Bearbeiten-Box – auf Grau wäre eine graue
+     Fläche unsichtbar. Sichtbar wird er hier über den Rahmen. */
+  background: var(--card);
+  font-size: 13px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.note-req--on {
+  border-left-color: var(--accent);
+  background: #fdf9ec; /* Gold --accent, 10 % auf Weiß */
+}
+
+.note-req__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* Aktiv hervorheben: der Block trägt dann eine Regel, die den Abschluss blockiert. */
+.note-req--on .note-req__toggle {
+  font-weight: 600;
+}
+
+.note-req__format {
+  font-size: 13px;
+}
+
+/* Wächst in die Restbreite, damit lange Beschriftungen lesbar bleiben – aber
+   mit Mindestbreite, sonst schrumpft das Feld in engen Tabellenzellen zu nichts. */
+.note-req__label {
+  flex: 1;
+  min-width: 200px;
+  font-size: 13px;
+}
+
+/* --- Fähigkeits-Auswahl beim Anlegen eines Schritts (SkillSelect) ---------
+   Einfachauswahl. Sieht aus wie die Mehrfachauswahl im Mitarbeiter-Tab, hat
+   aber keine Kästchen: gewählt wird über den Haken links, und es kann nur
+   einer stehen. */
+.skill-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 220px;
+  max-width: 280px;
+}
+.skill-select__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.skill-select__value--empty {
+  color: var(--muted);
+}
+
+.skill-select__menu {
+  min-width: 260px;
+  padding: 6px;
+}
+
+.skill-select__search {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+/* Nur die LISTE scrollt – Suchfeld und "Neu anlegen" bleiben stehen. Würde das
+   ganze Menü scrollen, wäre der Anlegen-Eintrag bei vielen Fähigkeiten
+   weggescrollt, also genau dann unerreichbar, wenn man ihn sucht. */
+.skill-select__list {
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.skill-select__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+/* Feste Breite für den Haken, damit alle Namen fluchten – ohne sie stünde der
+   gewählte Eintrag um die Hakenbreite eingerückt. */
+.skill-select__check {
+  width: 14px;
+  flex: none;
+  color: var(--brand);
+}
+
+.skill-select__create {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 6px 6px;
+  cursor: pointer;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* --- Schritt bearbeiten: Box statt gequetschter Tabellenzeile -------------
+   Beim Bearbeiten übernimmt die Zeile die volle Tabellenbreite (colSpan) und
+   wird zu einer eigenen Box. Grund: als normale Zeile mussten sich die Felder
+   die Spaltenbreiten der ANZEIGE teilen – die "Wartet auf"-Auswahl bekam ein
+   paar Zentimeter, in denen jeder Schrittname umbrach. */
+.step-edit-row td {
+  background: var(--hover);
+  padding: 0;
+}
+/* Hover-Einfärbung der Tabellenzeile hier abschalten: die Box ist bereits
+   abgesetzt, ein zusätzlicher Hover-Wechsel wirkt wie ein Klickziel. */
+.step-edit-row:hover td {
+  background: var(--hover);
+}
+
+.step-edit {
+  padding: 14px 16px;
+  border-left: 3px solid var(--brand);
+}
+
+.step-edit__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.step-edit__no {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Beschriftung | Feld. max-content misst die Spalte am längsten Wort, statt
+   sie auf einen geschätzten Pixelwert festzunageln. */
+.step-edit__grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px 14px;
+  align-items: start;
+}
+/* Beschriftungen: an der ersten Textzeile ihres Feldes ausgerichtet, nicht
+   mittig zum ganzen Block – sonst rutscht "Wartet auf" bei fünf Schritten in
+   die Mitte der Liste. */
+.step-edit__grid > label {
+  padding-top: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.step-edit__team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.step-edit__team input {
+  width: 72px;
+}
+
+.step-edit__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* --- Checkbox-Liste mit hängendem Einzug ---------------------------------
+   Untereinander, und ein umbrechender Text fluchtet unter dem Text – nicht
+   unter der Checkbox. Deshalb je Eintrag ein eigenes Zwei-Spalten-Raster
+   (Kästchen | Text) statt eines Inline-Flusses: die Textspalte bildet den
+   Umbruchbereich, das Kästchen bleibt außerhalb. */
+.check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.check-list__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: start;
+  font-size: 13px;
+  cursor: pointer;
+}
+/* Kästchen an der ersten Textzeile ausrichten (Standard wäre die Grundlinie
+   des gesamten mehrzeiligen Blocks). */
+.check-list__item input {
+  margin-top: 3px;
+}
+
+/* Nutzer mit reduzierter Bewegung: keine Übergänge/Animationen. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* --- Erinnerungen ---------------------------------------------------------
+   Faellige Erinnerungen stehen ganz oben im Dashboard und verlangen eine
+   Entscheidung. Deshalb GOLD statt eines Semantik-Tons: Gold ist die
+   Akzentfarbe der Marke und hier richtig, weil eine Erinnerung weder Fehler
+   (rot) noch blosse Information (blau) ist - sie wartet auf eine Handlung.
+   Regel der Farbwelt beachtet: Gold traegt Flaeche/Rand, der Text bleibt Navy. */
+.reminder-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.reminder-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: #fdf8e7;
+  border: 1px solid #f0dfa4;
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-xs);
+  color: var(--text);
+}
+
+/* Ueberfaellig: kraeftigerer Rand statt einer zweiten Farbe - die Erinnerung
+   bleibt dieselbe Sache, sie ist nur dringlicher geworden. */
+.reminder-card--overdue {
+  border-left-color: #c0392b;
+  background: #fdf3ee;
+  border-color: #f0c8bb;
+}
+
+.reminder-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.reminder-card__due {
+  font-size: 13px;
+  color: var(--muted);
+}
+.reminder-card--overdue .reminder-card__due {
+  color: #a03325;
+  font-weight: 600;
+}
+
+.reminder-card__desc {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.reminder-card__error {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #a03325;
+}
+
+/* Die Knopfreihe bleibt beisammen und rutscht als Block in die naechste Zeile,
+   statt einzeln umzubrechen. */
+.reminder-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Schmale Variante fuer die Tage-Auswahl beim Verschieben (1-7). */
+.btn--sm {
+  padding: 5px 10px;
+  font-size: 13px;
+  min-width: 34px;
+}
+
+/* --- Entscheidungen im Tagesjournal --------------------------------------- */
+.reminder-journal {
+  margin-top: 10px;
+}
+
+.reminder-journal__head {
+  font-size: 14px;
+  margin: 0 0 6px;
+  color: var(--muted);
+}
+
+.reminder-journal__row {
+  display: grid;
+  /* Feste erste Spalte: die Entscheidungs-Pillen fluchten damit untereinander,
+     obwohl ihre Woerter unterschiedlich lang sind. */
+  grid-template-columns: 132px 1fr max-content;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: #fff;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.reminder-journal__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reminder-journal__who {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Pillen wie die uebrigen Badges: weiche Flaeche + duenner Innenring. */
+.reminder-decision {
+  justify-self: start;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.reminder-decision--DONE {
+  background: #e7f6ec;
+  color: #14804a;
+  box-shadow: inset 0 0 0 1px #b7e0c6;
+}
+.reminder-decision--POSTPONED {
+  background: #fdf6e6;
+  color: #8a5d00;
+  box-shadow: inset 0 0 0 1px #f2dda6;
+}
+.reminder-decision--POOLED {
+  background: #eff5fd;
+  color: #1d4e89;
+  box-shadow: inset 0 0 0 1px #c5dcf7;
+}
+.reminder-decision--OBSOLETE {
+  background: #f1f3f6;
+  color: #5b6472;
+  box-shadow: inset 0 0 0 1px #dfe3e9;
+}
+
+@media (max-width: 700px) {
+  .reminder-journal__row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

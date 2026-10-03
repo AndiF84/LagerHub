@@ -1,0 +1,1250 @@
+<title>LagerHub Installationstag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  /* ---------------------------------------------------------------
+     Gleiche Tokens wie docs/Serveruebergabe.html - die drei Dokumente
+     (IT-Abstimmung, Serveruebergabe, Installationstag) sollen als eine
+     Reihe erkennbar sein. Palette aus der LagerHub-Markenwelt: Navy +
+     Gold, Neutrale leicht navy-gebrochen, kein reines Grau.
+     Regel von dort: NIE Gold-Text auf Weiss - Gold nur als Flaeche,
+     Linie oder Rahmen, Text darauf immer Navy.
+     ---------------------------------------------------------------- */
+  :root {
+    --navy:        #212C3D;
+    --navy-700:    #2C3A50;
+    --navy-500:    #4A5A73;
+    --gold:        #EEC643;
+    --gold-soft:   #FBF0CC;
+
+    --ground:      #F5F7FA;
+    --surface:     #FFFFFF;
+    --surface-2:   #EDF1F6;
+    --line:        #D7DEE8;
+    --line-strong: #B9C4D3;
+
+    --ink:         #1B2432;
+    --ink-soft:    #55637A;
+    --ink-faint:   #7C8798;
+
+    --risk:        #A8322A;
+    --risk-bg:     #FBEDEC;
+    --done:        #14804A;
+    --done-bg:     #E7F3EC;
+
+    --r-sm: 4px;
+    --r-md: 8px;
+    --shadow: 0 1px 2px rgba(33,44,61,.06), 0 4px 14px rgba(33,44,61,.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --navy:        #0E141E;
+      --navy-700:    #182231;
+      --navy-500:    #93A2B8;
+      --gold:        #E8C051;
+      --gold-soft:   #332D14;
+
+      --ground:      #11161F;
+      --surface:     #1A2230;
+      --surface-2:   #212B3B;
+      --line:        #2E3A4C;
+      --line-strong: #435268;
+
+      --ink:         #E4E9F1;
+      --ink-soft:    #A9B5C7;
+      --ink-faint:   #7F8CA1;
+
+      --risk:        #F2938A;
+      --risk-bg:     #2E1A18;
+      --done:        #5FC08D;
+      --done-bg:     #13291F;
+
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 14px rgba(0,0,0,.28);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --navy:        #0E141E;
+    --navy-700:    #182231;
+    --navy-500:    #93A2B8;
+    --gold:        #E8C051;
+    --gold-soft:   #332D14;
+
+    --ground:      #11161F;
+    --surface:     #1A2230;
+    --surface-2:   #212B3B;
+    --line:        #2E3A4C;
+    --line-strong: #435268;
+
+    --ink:         #E4E9F1;
+    --ink-soft:    #A9B5C7;
+    --ink-faint:   #7F8CA1;
+
+    --risk:        #F2938A;
+    --risk-bg:     #2E1A18;
+    --done:        #5FC08D;
+    --done-bg:     #13291F;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 14px rgba(0,0,0,.28);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* --- Kopf ---------------------------------------------------- */
+  .head {
+    background: linear-gradient(160deg, var(--navy-700), var(--navy));
+    border-bottom: 3px solid var(--gold);
+    color: #fff;
+    padding: 40px 0 34px;
+    margin-bottom: 36px;
+  }
+  .head__inner {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .head__eyebrow {
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .head h1 {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-size: clamp(28px, 4.2vw, 40px);
+    line-height: 1.15;
+    margin: 0 0 12px;
+    text-wrap: balance;
+    font-weight: 600;
+  }
+  .head p {
+    margin: 0;
+    max-width: 62ch;
+    color: #C9D3E2;
+    font-size: 17px;
+  }
+  .head__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,.16);
+    font-size: 13.5px;
+    color: #AEBBCD;
+  }
+  .head__meta b { color: #fff; font-weight: 500; }
+
+  /* --- Fortschritt --------------------------------------------- */
+  .progress {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+  .progress__count {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .progress__bar {
+    flex: 1 1 180px;
+    height: 8px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+    min-width: 120px;
+  }
+  .progress__fill {
+    height: 100%;
+    width: 0;
+    background: var(--done);
+    border-radius: 999px;
+    transition: width .25s ease;
+  }
+  .progress__reset {
+    font: inherit;
+    font-size: 13px;
+    background: none;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-soft);
+    border-radius: var(--r-sm);
+    padding: 4px 11px;
+    cursor: pointer;
+  }
+  .progress__reset:hover { background: var(--surface-2); }
+
+  /* --- Abschnitte ---------------------------------------------- */
+  section { margin-bottom: 44px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--line);
+  }
+  .sec-head h2 {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-size: 23px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .sec-head span {
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+  .sec-intro {
+    color: var(--ink-soft);
+    max-width: 68ch;
+    margin: 0 0 20px;
+  }
+
+  /* --- Etappe ---------------------------------------------------
+     Nummeriert, weil die Reihenfolge hier wirklich zaehlt: Zeitzone
+     vor allem anderen, Datenbank vor Migration, Bauen vor Dienst.
+     --------------------------------------------------------------- */
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .step--done { border-color: var(--done); background: var(--done-bg); }
+
+  .step__top {
+    display: grid;
+    grid-template-columns: 26px 30px 1fr auto;
+    align-items: start;
+    gap: 12px;
+  }
+  .step__check {
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+    accent-color: var(--done);
+    cursor: pointer;
+  }
+  .step__no {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    line-height: 1.35;
+  }
+  .step--done .step__no { color: var(--done); }
+  .step__title {
+    font-weight: 600;
+    font-size: 17.5px;
+    margin: 0;
+    line-height: 1.35;
+  }
+  .step__sub {
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    margin: 3px 0 0;
+  }
+  .step__tags {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .who {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .who--it { background: var(--navy); color: #fff; }
+  .who--du { background: var(--gold); color: var(--navy); }
+  .who--beide { background: transparent; color: var(--ink-soft); box-shadow: inset 0 0 0 1px var(--line-strong); }
+  .dauer {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  .step__body { padding-left: 68px; }
+  @media (max-width: 640px) {
+    .step__top { grid-template-columns: 26px 30px 1fr; }
+    .step__tags { grid-column: 1 / -1; justify-content: flex-start; padding-left: 68px; }
+    .step__body { padding-left: 0; }
+  }
+
+  .step__body p { margin: 12px 0 0; max-width: 68ch; }
+  .step__body ul { margin: 10px 0 0; padding-left: 20px; }
+  .step__body li { margin-bottom: 5px; }
+  .step__body li::marker { color: var(--ink-faint); }
+
+  /* Befehle */
+  pre {
+    background: var(--navy);
+    color: #E7ECF4;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13.5px;
+    line-height: 1.65;
+    padding: 13px 15px;
+    border-radius: var(--r-sm);
+    overflow-x: auto;
+    margin: 12px 0 0;
+  }
+  pre .c { color: #93A7C4; }
+  code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .89em;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  /* "Fertig, wenn" - das prägende Element des Laufzettels */
+  .check {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 14px;
+    padding: 10px 13px;
+    background: var(--done-bg);
+    border-left: 3px solid var(--done);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 14.5px;
+  }
+  .step--done .check { background: var(--surface); }
+  .check__label {
+    color: var(--done);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .check__text { min-width: 0; }
+  .check code { background: rgba(20,128,74,.10); }
+
+  /* Stolperstelle */
+  .warn {
+    margin-top: 14px;
+    padding: 11px 14px;
+    background: var(--risk-bg);
+    border-left: 3px solid var(--risk);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 14.5px;
+  }
+  .warn b { color: var(--risk); }
+  .warn code { background: rgba(168,50,42,.10); }
+
+  /* Notizfeld */
+  .note {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .note label {
+    font-size: 12px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+  }
+  .note input {
+    flex: 1 1 240px;
+    font: inherit;
+    font-size: 14px;
+    font-family: "IBM Plex Mono", monospace;
+    padding: 6px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--ink);
+    min-width: 0;
+  }
+  .note input:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+
+  /* --- Tabellen ------------------------------------------------- */
+  .tablewrap { overflow-x: auto; margin-top: 16px; }
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    background: var(--surface);
+    font-size: 14.5px;
+  }
+  th {
+    text-align: left;
+    font-size: 11.5px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    padding: 9px 13px;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 13px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+  .card h3 {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-size: 18px;
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+  .card p { margin: 0 0 10px; max-width: 68ch; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .foot {
+    margin-top: 46px;
+    padding-top: 20px;
+    border-top: 2px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 14.5px;
+  }
+
+  a { color: var(--navy-500); }
+  :root[data-theme="dark"] a, :root:not([data-theme="light"]) a { }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<header class="head">
+  <div class="head__inner">
+    <p class="head__eyebrow">Laufzettel · zum Abarbeiten am Server</p>
+    <h1>LagerHub Installationstag</h1>
+    <p>
+      Die Reihenfolge für den Einrichtungstermin: elf Etappen, nach jeder eine Prüfung, die
+      sagt, ob sie wirklich saß. Gedacht zum gemeinsamen Durchgehen mit der IT — einer bedient,
+      einer liest vor.
+    </p>
+    <div class="head__meta">
+      <span>Dauer <b>ein halber Tag</b></span>
+      <span>Anwendung <b>LagerHub</b> · Node.js, IIS, PostgreSQL</span>
+      <span>Das <b>Warum</b> steht in der Serverübergabe</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="progress">
+    <span class="progress__count" id="count">0 von 11 Etappen</span>
+    <div class="progress__bar"><div class="progress__fill" id="fill"></div></div>
+    <button class="progress__reset" id="reset" type="button">Zurücksetzen</button>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <h2>Bevor der Termin beginnt</h2>
+      <span>ohne das steht der Termin still</span>
+    </div>
+    <p class="sec-intro">
+      Diese vier Dinge brauchen Vorlauf — teils Tage. Wenn sie am Morgen des Termins noch offen
+      sind, wird es kein halber Tag.
+    </p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Was</th><th>Wer</th><th>Warum es Vorlauf braucht</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Zwei DNS-Namen</b><br><span style="color:var(--ink-soft)">z. B. lagerhub… und app…</span></td>
+            <td>IT</td>
+            <td>Zeigen intern auf die Server-IP. Das Zertifikat kann erst geholt werden, wenn die
+              Namen stehen — und DNS-Änderungen brauchen manchmal einen Tag.</td>
+          </tr>
+          <tr>
+            <td><b>Software heruntergeladen</b></td>
+            <td>IT</td>
+            <td>Node.js 22+, PostgreSQL 16+ (entwickelt wird auf 17), URL Rewrite, ARR,
+              win-acme, NSSM. Am Termin selbst hakt sonst der Download an der Firewall.
+              <br><span style="color:var(--ink-soft)">Die mitgelieferten Bibliotheken sind
+              zwar auf einer neueren Node-Version gebaut, das ist hier aber unkritisch: der
+              Dienst lädt zur Laufzeit kein einziges maschinennahes Modul — der
+              Datenbankzugriff läuft vollständig über JavaScript und WebAssembly.</span></td>
+          </tr>
+          <tr>
+            <td><b>Eigenes Crewmeister-Konto</b></td>
+            <td>Fachbereich</td>
+            <td>Für den Dienst, nicht dein persönliches. Muss von Crewmeister angelegt werden.</td>
+          </tr>
+          <tr>
+            <td><b>Übergabe-Paket entpackt</b><br><span style="color:var(--ink-soft)">das ZIP vom Stick</span></td>
+            <td>gemeinsam</td>
+            <td>Der Ordner <code>LagerHub\</code> aus dem ZIP kommt <b>unverändert</b> nach
+              <code>C:\LagerHub</code>. Er bringt <code>node_modules</code> und eine
+              weitgehend ausgefüllte <code>.env</code> bereits mit — am Termin wird deshalb
+              <b>nichts installiert und nichts gebaut</b>. Nach dem Entpacken einmal
+              Rechtsklick → Eigenschaften → <b>Zulassen</b>, sonst blockiert Windows die
+              Dateien aus fremder Quelle.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Die Etappen</h2>
+      <span>der Reihe nach — jede baut auf der vorigen auf</span>
+    </div>
+    <p class="sec-intro">
+      Jede Etappe endet mit einer Prüfung. Erst wenn die stimmt, geht es weiter: Ein Fehler in
+      Etappe 2 zeigt sich sonst erst in Etappe 8, und dann sucht man an der falschen Stelle.
+    </p>
+
+    <!-- 1 -->
+    <div class="step" data-step="1">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 1 erledigt">
+        <span class="step__no">01</span>
+        <div>
+          <p class="step__title">Zeitzone prüfen</p>
+          <p class="step__sub">Vor allem anderen, weil es später niemand mehr nachvollzieht</p>
+        </div>
+        <div class="step__tags"><span class="who who--it">IT</span><span class="dauer">2 min</span></div>
+      </div>
+      <div class="step__body">
+        <pre><code>tzutil /g</code></pre>
+        <p>
+          Muss <code>W. Europe Standard Time</code> ergeben. Falls nicht:
+          <code>tzutil /s "W. Europe Standard Time"</code>
+        </p>
+        <div class="warn">
+          <b>Warum zuerst:</b> LagerHub rechnet an vielen Stellen mit der lokalen Uhrzeit —
+          Feierabend, Mittagspause, Tagesgrenze der Auswertungen, Fälligkeit der Erinnerungen.
+          Auf einem UTC-Server unterbricht der Feierabend im Sommer zwei Stunden zu spät und die
+          Tagesberichte schneiden an der falschen Stelle. Das fällt erst nach Wochen auf.
+        </div>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text"><code>tzutil /g</code> die europäische Zeitzone meldet.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="step" data-step="2">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 2 erledigt">
+        <span class="step__no">02</span>
+        <div>
+          <p class="step__title">Grundsoftware installieren</p>
+          <p class="step__sub">Node, PostgreSQL, IIS mit seinen drei Erweiterungen</p>
+        </div>
+        <div class="step__tags"><span class="who who--it">IT</span><span class="dauer">45 min</span></div>
+      </div>
+      <div class="step__body">
+        <ul>
+          <li>Node.js 22 oder neuer (LTS genügt)</li>
+          <li>PostgreSQL 16 oder neuer, offizieller Windows-Installer</li>
+          <li>IIS mit <b>URL Rewrite</b>, <b>Application Request Routing</b> und dem
+            Windows-Feature <b>WebSocket Protocol</b></li>
+          <li>NSSM (macht den Dienst) und win-acme (holt das Zertifikat)</li>
+        </ul>
+        <pre><code>node -v      <span class="c">// v22 oder hoeher</span>
+npm -v
+psql --version</code></pre>
+        <div class="warn">
+          <b>Das WebSocket-Feature wird am häufigsten vergessen.</b> Ohne es läuft alles
+          scheinbar — nur aktualisieren sich Dashboard und Handy-App nicht mehr von selbst. Es
+          gibt keine Fehlermeldung, die App wirkt bloß träge. In Etappe 9 wird genau das geprüft.
+        </div>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text">Die drei Befehle Versionen ausgeben und im Server-Manager
+            unter den IIS-Rollendiensten <i>WebSocket Protocol</i> als installiert steht.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="step" data-step="3">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 3 erledigt">
+        <span class="step__no">03</span>
+        <div>
+          <p class="step__title">Datenbank anlegen</p>
+          <p class="step__sub">Leere Datenbank plus eigener Benutzer — die Tabellen kommen später von allein</p>
+        </div>
+        <div class="step__tags"><span class="who who--it">IT</span><span class="dauer">10 min</span></div>
+      </div>
+      <div class="step__body">
+        <pre><code>psql -U postgres
+CREATE USER lagerhub WITH PASSWORD '<span class="c">langes-passwort-nur-buchstaben-und-ziffern</span>';
+CREATE DATABASE lagerhub OWNER lagerhub;
+\q</code></pre>
+        <div class="warn">
+          <b>Das Passwort am besten ohne Sonderzeichen vergeben</b> — lang, aber nur
+          Buchstaben und Ziffern. Es wird gleich in Etappe 4 in eine <b>URL</b> eingesetzt,
+          und dort beendet ein <code>@</code> den Passwort-Teil: aus
+          <code>…lagerhub:pa@ss@localhost…</code> wird ein Host namens <code>ss</code>.
+          Die Verbindung läuft dann ins Leere, <b>ohne dass die Zeile falsch aussieht</b>.
+          Betroffen sind <code>@ : / ? # % &amp;</code>. Wer sie trotzdem will, muss den Wert
+          kodieren — wie, steht in Etappe 4. Länge ersetzt Sonderzeichen hier vollwertig:
+          30 Stellen aus Buchstaben und Ziffern sind nicht zu raten.
+        </div>
+        <p>
+          Keine Tabellen von Hand anlegen — das erledigt Etappe 5. PostgreSQL hört nur auf
+          <code>localhost</code>; von außen muss die Datenbank nicht erreichbar sein.
+        </p>
+        <div class="note">
+          <label for="n-db">Notiz · Datenbankname und Benutzer</label>
+          <input id="n-db" type="text" placeholder="lagerhub / lagerhub — Passwort NICHT hier">
+        </div>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text"><code>psql -U lagerhub -d lagerhub -c "select 1"</code>
+            durchläuft.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="step" data-step="4">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 4 erledigt">
+        <span class="step__no">04</span>
+        <div>
+          <p class="step__title">Einstellungen eintragen</p>
+          <p class="step__sub">Die Datei <code>backend\.env</code> — beim Stick-Paket sind nur noch zwei Werte offen</p>
+        </div>
+        <div class="step__tags"><span class="who who--beide">gemeinsam</span><span class="dauer">5 min</span></div>
+      </div>
+      <div class="step__body">
+        <div class="warn">
+          <b>Kam das Projekt vom Übergabe-Stick, ist <code>backend\.env</code> schon
+          ausgefüllt</b> — auf Anweisung des Betreibers. Bereits eingetragen sind die
+          <b>Admin-PINs</b>, die <b>VAPID-Schlüssel</b> für die Benachrichtigungen und der
+          <b>Crewmeister-Zugang</b>; das <b>JWT_SECRET</b> wurde beim Packen frisch erzeugt.
+          Offen sind nur noch <b>zwei</b> Werte, beide unten in der Tabelle markiert:
+          <code>DATABASE_URL</code>/<code>DIRECT_URL</code> und <code>CORS_ORIGIN</code>.
+          <b>Diese Datei nicht mit <code>.env.example</code> überschreiben</b> — dabei gingen
+          genau die Werte verloren, die euch die Arbeit ersparen. Ein Hinweis dazu steht
+          auch oben in der Datei selbst.
+        </div>
+        <p>
+          Nur bei einem <b>Git-Klon ohne vorbereitete <code>.env</code></b> ist die Vorlage
+          <code>backend\.env.production.example</code> die Grundlage, und diese beiden Werte
+          müssen selbst erzeugt werden:
+        </p>
+        <pre><code><span class="c">// Anmelde-Schluessel (JWT_SECRET)</span>
+node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
+
+<span class="c">// Schluesselpaar fuer die Benachrichtigungen (VAPID)</span>
+npx web-push generate-vapid-keys</code></pre>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Eintrag</th><th>Wert</th></tr></thead>
+            <tbody>
+              <tr><td><code>DATABASE_URL</code><br><code>DIRECT_URL</code></td>
+                  <td><b>← NOCH EINZUTRAGEN.</b> Beide auf die lokale PostgreSQL aus Etappe 3.
+                    Format: <code>postgresql://lagerhub:PASSWORT@localhost:5432/lagerhub</code>.
+                    <b>Enthält das Passwort Sonderzeichen, müssen sie kodiert werden</b> —
+                    siehe Warnung unter der Tabelle</td></tr>
+              <tr><td><code>CORS_ORIGIN</code></td>
+                  <td><b>← NOCH EINZUTRAGEN,</b> sobald die Adressen feststehen: die beiden
+                    Hostnamen aus Etappe 6, mit Komma getrennt und mit <code>https://</code>
+                    davor. Bleibt das Feld leer, läuft alles — der Dienst nimmt dann aber
+                    Anfragen von jeder Herkunft an und schreibt beim Start eine Warnung ins
+                    Protokoll</td></tr>
+              <tr><td><code>JWT_SECRET</code></td>
+                  <td>Beim Stick-Paket <b>schon gesetzt</b> (beim Packen erzeugt). Pflicht —
+                    ohne ihn startet der Dienst absichtlich nicht. Beim Ändern müssen sich
+                    alle neu anmelden</td></tr>
+              <tr><td><code>ADMIN_PINS</code></td>
+                  <td>Beim Stick-Paket <b>schon gesetzt</b>, vom Betreiber vorgegeben. Das ist
+                    der einzige Zugang in ein frisches System — die Datenbank ist leer, es gibt
+                    noch keinen Mitarbeiter. Format <code>1234:Name</code>, mehrere mit Komma.
+                    Wird beim Start <b>einmal</b> gelesen: Änderungen wirken erst nach einem
+                    Neustart des Dienstes</td></tr>
+              <tr><td><code>VAPID_PUBLIC_KEY</code><br><code>VAPID_PRIVATE_KEY</code></td>
+                  <td>Beim Stick-Paket <b>schon gesetzt</b>. Danach nie wieder ändern — sonst
+                    müssen alle Mitarbeiter die Benachrichtigungen neu einschalten</td></tr>
+              <tr><td><code>CREWMEISTER_*</code></td>
+                  <td>Beim Stick-Paket <b>schon gesetzt</b> (Zugang des Dienst-Kontos)</td></tr>
+              <tr><td><code>NODE_ENV</code>, <code>TZ</code><br><code>PORT</code>, <code>HOST</code></td>
+                  <td>Stehen fest in der Vorlage (<code>production</code>,
+                    <code>Europe/Berlin</code>, <code>3000</code>, <code>localhost</code>) —
+                    nichts zu tun</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="warn">
+          <b>Sonderzeichen im Datenbank-Passwort zerlegen die Verbindungszeichenfolge.</b>
+          Sie ist eine URL — ein <code>@</code> im Passwort beendet dort den Passwort-Teil.
+          Aus <code>…lagerhub:pa@ss@localhost…</code> wird ein Host namens <code>ss</code>,
+          und die Verbindung läuft ins Leere, <b>ohne dass die Zeile falsch aussieht</b>.
+          Betroffen sind <code>@ : / ? # % &amp;</code>. Entweder ein Passwort ohne diese Zeichen
+          vergeben — oder den Wert kodieren mit
+          <code>node -e "console.log(encodeURIComponent(process.argv[1]))" DAS_PASSWORT</code>
+          und die Ausgabe in die URL setzen (<code>@</code> wird zu <code>%40</code> und so fort).
+          <code>npm run db:check</code> erkennt diesen Fall und sagt es.
+        </div>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text"><code>npm run db:check</code> im Ordner
+            <code>backend</code> meldet <i>Die Datenbank-Verbindung steht</i>. In der
+            <code>.env</code> steht dann kein <code>[PASSWORT]</code> mehr.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="step" data-step="5">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 5 erledigt">
+        <span class="step__no">05</span>
+        <div>
+          <p class="step__title">Tabellen anlegen</p>
+          <p class="step__sub">Beim Stick-Paket zwei Befehle — gebaut ist schon alles</p>
+        </div>
+        <div class="step__tags"><span class="who who--it">IT</span><span class="dauer">5 min</span></div>
+      </div>
+      <div class="step__body">
+        <div class="warn">
+          <b>Zuerst klären, welcher Weg gilt — daran hängt alles Weitere.</b>
+          Kam das Projekt vom <b>Übergabe-Stick</b>, ist es <b>fertig gebaut</b> und
+          <code>backend\node_modules</code> liegt schon da. Dann <b>weder <code>npm ci</code> noch
+          <code>npm run build</code></b> ausführen: <code>npm ci</code> <b>löscht
+          <code>node_modules</code> als Erstes</b> und lädt alles neu aus dem Internet. Auf einem
+          abgeschotteten Server bricht es dabei ab — und der mitgelieferte Baum ist weg. Danach
+          startet weder der Dienst noch kommt eine Datenbankverbindung zustande.
+          Weg B gilt nur für einen <b>Git-Klon ohne <code>node_modules</code></b>, und der
+          braucht Internetzugang.
+        </div>
+
+        <p><b>Weg A — Paket vom Stick (der Normalfall)</b></p>
+        <pre><code>cd C:\LagerHub\backend
+npm run db:check          <span class="c">// prueft die Verbindung, benennt die Ursache</span>
+npm run migrate:deploy    <span class="c">// legt die Tabellen an</span></code></pre>
+        <p>Mehr nicht. <code>frontend\dist</code> und <code>pwa\dist</code> liegen fertig gebaut
+          im Paket, ebenso der erzeugte Prisma-Client.</p>
+
+        <p><b>Weg B — Git-Klon ohne <code>node_modules</code> (nur mit Internetzugang)</b></p>
+        <pre><code><span class="c">// Dienst</span>
+cd C:\LagerHub\backend
+npm ci
+npm run db:generate
+npm run db:check
+npm run migrate:deploy
+npm run build
+
+<span class="c">// Dashboard</span>
+cd ..\frontend
+npm ci
+npm run build
+
+<span class="c">// Handy-App</span>
+cd ..\pwa
+npm ci
+npm run build</code></pre>
+        <div class="warn">
+          <b>Meldungen über neue Versionen ignorieren.</b>
+          Prisma weist bei jedem Aufruf auf eine neuere Version hin. Dieser Hinweis ist
+          <b>kein Arbeitsauftrag</b> — am Installationstag wird <b>nichts</b> aktualisiert.
+          Die Versionen im Paket sind aufeinander abgestimmt und geprüft; ein
+          <code>npm install</code> oder <code>npm audit fix</code> holt im besten Fall nichts
+          (kein Netz), im schlechteren eine Vorabversion. Aktualisiert wird beim Entwickler,
+          nie hier.
+        </div>
+        <div class="warn">
+          <b>Immer <code>migrate deploy</code>, nie <code>migrate dev</code>.</b>
+          Die Entwickler-Variante darf das Schema umbauen und im Zweifel die Datenbank leeren —
+          auf einem Server mit echten Daten wäre das ein Totalverlust. <code>deploy</code>
+          wendet ausschließlich die vorhandenen Migrationen an.
+        </div>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text"><code>npm run migrate:deploy</code> lief durch und meldet
+            beim zweiten Aufruf <i>No pending migrations to apply</i>. In
+            <code>frontend\dist</code> und <code>pwa\dist</code> liegen Dateien — beim
+            Stick-Paket von Anfang an.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="step" data-step="6">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 6 erledigt">
+        <span class="step__no">06</span>
+        <div>
+          <p class="step__title">Dienst einrichten</p>
+          <p class="step__sub">Erst von Hand starten, dann als Windows-Dienst festzurren</p>
+        </div>
+        <div class="step__tags"><span class="who who--it">IT</span><span class="dauer">20 min</span></div>
+      </div>
+      <div class="step__body">
+        <p>Zuerst der Handstart, damit Startfehler direkt im Fenster sichtbar sind:</p>
+        <pre><code>cd C:\LagerHub\backend
+npm start                       <span class="c">// hoert auf Port 3000</span>
+
+<span class="c">// im zweiten Fenster</span>
+curl http://localhost:3000/health</code></pre>
+        <p>
+          Antwortet er mit <code>{"ok":true}</code>, wird er mit NSSM auf
+          <code>node dist\index.js</code> im Ordner <code>backend</code> als Dienst eingerichtet —
+          mit automatischem Start und Neustart nach einem Absturz. Danach das Handfenster schließen
+          und den Dienst starten.
+        </p>
+        <div class="note">
+          <label for="n-svc">Notiz · Name des Windows-Dienstes</label>
+          <input id="n-svc" type="text" placeholder="z. B. LagerHub">
+        </div>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text">Der Server wurde einmal neu gestartet und
+            <code>/health</code> antwortet <b>ohne</b> dass jemand etwas von Hand startet.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="step" data-step="7">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 7 erledigt">
+        <span class="step__no">07</span>
+        <div>
+          <p class="step__title">IIS einrichten</p>
+          <p class="step__sub">Zwei Websites, gleicher Aufbau, unterschiedliche Ordner</p>
+        </div>
+        <div class="step__tags"><span class="who who--it">IT</span><span class="dauer">40 min</span></div>
+      </div>
+      <div class="step__body">
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Website</th><th>Dateien</th><th>Weiterleitung</th></tr></thead>
+            <tbody>
+              <tr><td>Dashboard<br><span style="color:var(--ink-soft)">lagerhub…</span></td>
+                  <td><code>C:\LagerHub\frontend\dist</code></td>
+                  <td rowspan="2"><code>/api</code> und <code>/ws</code> →<br>
+                      <code>http://localhost:3000</code><br>
+                      alles andere auf <code>index.html</code></td></tr>
+              <tr><td>Handy-App<br><span style="color:var(--ink-soft)">app…</span></td>
+                  <td><code>C:\LagerHub\pwa\dist</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Unbekannte Pfade müssen auf <code>index.html</code> zeigen, sonst führt ein Neuladen
+          innerhalb der App zu einem 404. Für <code>/ws</code> muss die Zwischenspeicherung in ARR
+          abgeschaltet sein — es ist eine dauerhafte Verbindung, keine einzelne Anfrage.
+        </p>
+        <div class="note">
+          <label for="n-host">Notiz · die beiden Hostnamen</label>
+          <input id="n-host" type="text" placeholder="lagerhub.firma.de · app.firma.de">
+        </div>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text">Beide Adressen liefern im Browser des Servers die
+            Anmeldemaske — noch über <code>http</code>, das Zertifikat kommt als Nächstes.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="step" data-step="8">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 8 erledigt">
+        <span class="step__no">08</span>
+        <div>
+          <p class="step__title">Zertifikat und Freigaben</p>
+          <p class="step__sub">Ohne gültiges Zertifikat keine App-Installation und keine Benachrichtigungen</p>
+        </div>
+        <div class="step__tags"><span class="who who--it">IT</span><span class="dauer">30 min</span></div>
+      </div>
+      <div class="step__body">
+        <p>
+          win-acme holt ein Zertifikat für beide Namen über die <b>DNS-01</b>-Prüfung, trägt es in
+          die IIS-Bindungen ein und legt die Erneuerung als geplante Aufgabe an. Dazu die
+          ausgehenden Freigaben:
+        </p>
+        <ul>
+          <li><code>api.crewmeister.com</code> — Anwesenheit aus der Zeiterfassung</li>
+          <li>Push-Dienste der Browser-Hersteller — Benachrichtigungen aufs Handy</li>
+          <li>Let's Encrypt und der DNS-Anbieter — Zertifikatserneuerung</li>
+          <li>Eingehend: <b>443</b> aus dem Firmennetz. Aus dem Internet nichts.</li>
+        </ul>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text">Beide Adressen sind von einem <b>anderen</b> Rechner im Netz
+            über <code>https</code> erreichbar und der Browser zeigt kein Zertifikatswarnung.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="step" data-step="9">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 9 erledigt">
+        <span class="step__no">09</span>
+        <div>
+          <p class="step__title">Live-Verbindung prüfen</p>
+          <p class="step__sub">Der Test, der die häufigste Fehlkonfiguration sofort zeigt</p>
+        </div>
+        <div class="step__tags"><span class="who who--beide">gemeinsam</span><span class="dauer">5 min</span></div>
+      </div>
+      <div class="step__body">
+        <p>
+          Dashboard über die neue Adresse öffnen und anmelden. Oben links neben dem Logo steht der
+          Verbindungsstatus:
+        </p>
+        <ul>
+          <li><b>● Live</b> — die Verbindung steht.</li>
+          <li><b>● Verbinde…</b> oder <b>● Getrennt</b>, dauerhaft — die WebSocket-Weiterleitung
+            greift nicht. Zurück zu Etappe 2 und 7: Windows-Feature installiert? ARR-Zwischenspeicher
+            für <code>/ws</code> aus?</li>
+        </ul>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text">Der Kopf zeigt dauerhaft <b>● Live</b> — und eine Änderung an
+            einem Gerät erscheint am zweiten, ohne dass jemand neu lädt.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="step" data-step="10">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 10 erledigt">
+        <span class="step__no">10</span>
+        <div>
+          <p class="step__title">Abnahme zu zweit</p>
+          <p class="step__sub">Ein echter Durchlauf mit zwei Geräten — der eigentliche Beweis</p>
+        </div>
+        <div class="step__tags"><span class="who who--du">du</span><span class="dauer">20 min</span></div>
+      </div>
+      <div class="step__body">
+        <p>
+          Der Rest des Tages prüft Technik; das hier prüft die Anwendung. Einer am Dashboard,
+          einer am Handy. Die dabei angelegten Testdaten anschließend wieder löschen.
+        </p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Schritt</th><th>Erwartung</th></tr></thead>
+            <tbody>
+              <tr><td>Fähigkeit, Mitarbeiter und eine Aufgabe mit zwei Schritten anlegen</td>
+                  <td>Der Mitarbeiter bekommt eine PIN</td></tr>
+              <tr><td>Am Handy die App-Adresse öffnen, mit PIN anmelden, zum Startbildschirm hinzufügen</td>
+                  <td>Sie startet danach ohne Browserleiste</td></tr>
+              <tr><td>Aufgabe im Dashboard starten</td>
+                  <td>Sie erscheint <b>sofort</b> am Handy, ohne Neuladen</td></tr>
+              <tr><td>Am Handy einloggen, abschließen</td>
+                  <td>Das Dashboard zieht sofort nach; die Zeit steht im Tagesjournal</td></tr>
+              <tr><td>Benachrichtigungen am Handy einschalten, im Dashboard eine Aufgabe auf <i>hoch</i> setzen</td>
+                  <td>Das Handy meldet sich — auch bei geschlossener App</td></tr>
+              <tr><td>Erinnerung mit Fälligkeit <b>heute</b> anlegen, Dashboard neu laden</td>
+                  <td>Sie steht oben als Banner mit vier Knöpfen</td></tr>
+              <tr><td>Auf <i>Erledigt</i> klicken</td>
+                  <td>Sie erscheint im Tagesjournal mit deinem Namen und der Uhrzeit</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="warn">
+          <b>Wenn die Benachrichtigung ausbleibt:</b> Das liegt fast nie an LagerHub. Entweder hat
+          das Handy im Hallen-WLAN keinen Internetzugang, oder die Push-Dienste sind ausgehend
+          gesperrt. Die App selbst funktioniert dann vollständig weiter — nur eben still.
+        </div>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text">Alle sieben Zeilen stimmen und die Testdaten wieder entfernt sind.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="step" data-step="11">
+      <div class="step__top">
+        <input class="step__check" type="checkbox" aria-label="Etappe 11 erledigt">
+        <span class="step__no">11</span>
+        <div>
+          <p class="step__title">Datensicherung einrichten</p>
+          <p class="step__sub">Der Punkt, der gern auf „machen wir nächste Woche" rutscht</p>
+        </div>
+        <div class="step__tags"><span class="who who--it">IT</span><span class="dauer">30 min</span></div>
+      </div>
+      <div class="step__body">
+        <p>
+          In der Datenbank liegt die gesamte Auftrags- und Arbeitszeit-Historie. Üblicher Weg ist
+          <code>pg_dump</code> als geplante Aufgabe.
+        </p>
+        <pre><code>pg_dump -U lagerhub -d lagerhub -F c -f D:\Backup\lagerhub_%DATE%.dump</code></pre>
+        <div class="check">
+          <span class="check__label">Fertig, wenn</span>
+          <span class="check__text">Eine Sicherung wurde <b>einmal zurückgespielt</b> — in eine
+            Testdatenbank, nicht in die echte. Eine nie zurückgespielte Sicherung ist keine.</span>
+        </div>
+        <div class="note">
+          <label for="n-backup">Notiz · Ablageort und Takt</label>
+          <input id="n-backup" type="text" placeholder="z. B. D:\Backup, täglich 02:00, 30 Tage">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Wenn etwas nicht geht</h2>
+      <span>die Fälle, die erfahrungsgemäß auftreten</span>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Symptom</th><th>Meist die Ursache</th><th>Prüfen</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Keine Verbindung zur Datenbank</b><br>
+              <span style="color:var(--ink-soft)">der häufigste Fall</span></td>
+            <td>Kennwort noch nicht eingetragen, Sonderzeichen darin nicht kodiert, Dienst
+              nicht gestartet oder Benutzer/Datenbank fehlen</td>
+            <td><b><code>npm run db:check</code></b> im Ordner <code>backend</code> — geht
+              die Kette der Reihe nach durch und benennt die Ursache im Klartext, statt eine
+              rohe Fehlermeldung durchzureichen</td>
+          </tr>
+          <tr>
+            <td>Dienst startet nicht</td>
+            <td><code>DATABASE_URL</code> oder <code>JWT_SECRET</code> fehlt in der
+              <code>.env</code>. Beim Stick-Paket ist das Secret gesetzt — bleibt also die
+              Datenbankadresse</td>
+            <td>Von Hand <code>npm start</code> — der Grund steht im Klartext im Fenster.
+              Davor <code>npm run db:check</code></td>
+          </tr>
+          <tr>
+            <td>Anmeldung schlägt fehl, Seite lädt aber</td>
+            <td>Tabellen fehlen — <code>migrate deploy</code> wurde übersprungen</td>
+            <td><code>npm run db:check</code> meldet dann <i>Die Datenbank ist leer</i></td>
+          </tr>
+          <tr>
+            <td>Nach zehn Anmeldungen kommt für alle <code>429</code></td>
+            <td>ARR reicht die Client-IP nicht durch — der Schutz gegen PIN-Raten zählt dann
+              alle Anfragen auf einen Topf</td>
+            <td>Siehe Serverübergabe, Abschnitt <code>X-Forwarded-For</code></td>
+          </tr>
+          <tr>
+            <td>Alles funktioniert, aktualisiert sich aber nicht von selbst</td>
+            <td>WebSocket-Weiterleitung</td>
+            <td>Verbindungsstatus im Dashboard-Kopf (Etappe 9)</td>
+          </tr>
+          <tr>
+            <td>Handy zeigt „nicht sicher" und installiert die App nicht</td>
+            <td>Zertifikat greift nur auf einer der beiden Adressen</td>
+            <td>Die App-Adresse in den IIS-Bindungen</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Später: eine neue Version einspielen</h2>
+      <span>Update-Paket vom Stick – Daten und Einstellungen bleiben</span>
+    </div>
+    <div class="card">
+      <h3>Der Normalfall: Update-Paket vom Stick</h3>
+      <p>
+        Der Entwickler liefert ein <b>Update-Paket</b> (<code>LagerHub-Update-&lt;Datum&gt;.zip</code>).
+        Es ist für einen <b>bereits eingerichteten</b> Server gedacht und enthält bewusst
+        <b>keine</b> <code>.env</code>: Datenbank-Kennwort, <code>JWT_SECRET</code> und PINs des
+        Servers bleiben, wie sie sind. Internet braucht der Server dafür nicht.
+      </p>
+      <pre><code><span class="c">// 1. ZIP entpacken (vorher Rechtsklick - Eigenschaften - Zulassen)</span>
+<span class="c">// 2. update.bat per Rechtsklick "Als Administrator ausfuehren"</span>
+<span class="c">//    liegt LagerHub nicht unter C:\LagerHub, in einer Admin-PowerShell:</span>
+.\update.ps1 -Installation D:\LagerHub</code></pre>
+      <p style="margin-top:14px">Das Skript erledigt der Reihe nach:</p>
+      <ol>
+        <li><b>Datenbank sichern</b> (<code>pg_dump</code> nach <code>C:\LagerHub-Sicherungen</code>) – scheitert das, bricht es ab, bevor irgendetwas geändert ist.</li>
+        <li><b>Dienst anhalten</b> – den Windows-Dienst findet es selbst (NSSM-Dienst mit Arbeitsordner <code>backend</code>); sonst <code>-Dienst &lt;Name&gt;</code> aus der Notiz von Etappe 6.</li>
+        <li><b>Programmdateien austauschen</b> – der alte Stand wird beiseitegelegt (die letzten drei bleiben). Eine angepasste <code>web.config</code> bleibt erhalten; die neue liegt dann als <code>web.config.neu</code> daneben.</li>
+        <li><b>Datenbank prüfen und Schema nachziehen</b> (<code>db:check</code>, <code>migrate deploy</code>).</li>
+        <li><b>Dienst starten</b> und auf <code>/health</code> warten.</li>
+      </ol>
+      <div class="warn">
+        <b>Schlägt ein Schritt fehl, kommt der alte Stand automatisch zurück</b> und läuft wieder.
+        Das Fenster nennt die Ursache, das Protokoll liegt in <code>C:\LagerHub-Sicherungen</code>.
+        Wurde die Datenbank-Migration schon begonnen, steht dort zusätzlich der
+        <code>pg_restore</code>-Befehl für die Sicherung – meist ist er nicht nötig, weil neue
+        Spalten den alten Stand nicht stören.
+      </div>
+      <p style="margin-top:14px">
+        Angemeldete Benutzer bleiben angemeldet; Dashboard und Handy-App laden die neue Fassung
+        beim nächsten Öffnen.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Alternative mit Internet: aus dem Git-Stand bauen</h3>
+      <pre><code><span class="c">// 1. Dienst anhalten, 2. neuen Stand holen</span>
+git pull
+
+<span class="c">// 3. bauen - Datenbankstruktur inbegriffen</span>
+cd backend  &amp;&amp; npm ci &amp;&amp; npm run db:generate &amp;&amp; npm run migrate:deploy &amp;&amp; npm run build
+cd ..\frontend &amp;&amp; npm ci &amp;&amp; npm run build
+cd ..\pwa      &amp;&amp; npm ci &amp;&amp; npm run build
+
+<span class="c">// 4. Dienst wieder starten, dann /health pruefen</span></code></pre>
+      <div class="warn">
+        <b>Dieser Weg setzt Internetzugang auf dem Server voraus.</b>
+        <code>npm ci</code> löscht <code>node_modules</code> und lädt alles neu von
+        <code>registry.npmjs.org</code>. Ist der Server abgeschottet, bricht der Befehl ab und
+        hinterlässt <b>kein</b> <code>node_modules</code> — der Dienst startet dann nicht mehr.
+        Dann das Update-Paket oben verwenden.
+      </div>
+      <p style="margin-top:14px">
+        <b><code>migrate deploy</code> gehört zwingend dazu.</b> Bringt eine Version neue Felder
+        mit — wie zuletzt die Erinnerungen — fehlen ohne diesen Schritt die Tabellen, und der
+        betroffene Bereich läuft in einen Fehler, während der Rest normal weiterläuft. Vor einem
+        Update mit Schema-Änderung gehört eine frische Sicherung dazu.
+      </p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <p style="margin:0 0 8px"><b>Die drei Dokumente im Zusammenhang</b></p>
+    <p style="margin:0">
+      <i>IT-Abstimmung</i> — was vorab zu klären ist. <i>Serverübergabe</i> — was der Server
+      braucht und warum. <i>Dieser Laufzettel</i> — die Reihenfolge am Tag selbst. Die technische
+      Dokumentation der Anwendung liegt im Projektordner unter <code>CLAUDE.md</code>, die
+      Vorlage der Server-Einstellungen unter <code>backend\.env.production.example</code>
+      (die <code>.env.example</code> daneben ist die der Entwicklungsumgebung).
+    </p>
+    <p style="margin:14px 0 0; color:var(--ink-faint); font-size:13.5px">
+      Abhaken und Notizen bleiben in diesem Browser gespeichert — sie werden nirgends hochgeladen.
+      Deshalb gehören dort auch keine Passwörter hinein.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var KEY = "lagerhub-installationstag";
+    var steps = Array.prototype.slice.call(document.querySelectorAll(".step"));
+    var notes = Array.prototype.slice.call(document.querySelectorAll(".note input"));
+    var countEl = document.getElementById("count");
+    var fillEl = document.getElementById("fill");
+
+    function load() {
+      try {
+        var raw = localStorage.getItem(KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function save(state) {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(state));
+      } catch (e) {
+        /* Privates Fenster oder gesperrte Site-Daten: der Laufzettel
+           funktioniert weiter, er merkt sich nur nichts. */
+      }
+    }
+
+    var state = load();
+
+    function render() {
+      var done = 0;
+      steps.forEach(function (step) {
+        var on = step.querySelector(".step__check").checked;
+        step.classList.toggle("step--done", on);
+        if (on) done++;
+      });
+      countEl.textContent = done + " von " + steps.length + " Etappen";
+      fillEl.style.width = (steps.length ? (done / steps.length) * 100 : 0) + "%";
+    }
+
+    steps.forEach(function (step) {
+      var box = step.querySelector(".step__check");
+      var id = "s" + step.dataset.step;
+      box.checked = !!state[id];
+      box.addEventListener("change", function () {
+        state[id] = box.checked;
+        save(state);
+        render();
+      });
+    });
+
+    notes.forEach(function (input) {
+      var id = "n" + input.id;
+      if (typeof state[id] === "string") input.value = state[id];
+      input.addEventListener("input", function () {
+        state[id] = input.value;
+        save(state);
+      });
+    });
+
+    document.getElementById("reset").addEventListener("click", function () {
+      state = {};
+      save(state);
+      steps.forEach(function (s) { s.querySelector(".step__check").checked = false; });
+      notes.forEach(function (i) { i.value = ""; });
+      render();
+    });
+
+    render();
+  })();
+</script>

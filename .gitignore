@@ -1,0 +1,31 @@
+# Umgebungsvariablen (niemals committen) – alle .env-Varianten außer der Vorlage
+.env
+.env.*
+*.env.bak
+*.bak
+!.env.example
+!.env.production.example
+
+# Abhängigkeiten
+node_modules/
+
+# Build-Artefakte
+dist/
+dist-ssr/
+dev-dist/
+*.tsbuildinfo
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Lokale Entwicklungs-Zertifikate (privater Schluessel!) - via dev-certs.ps1 erzeugt
+certs/
+
+# Persoenliche Claude-Code-Einstellungen (nicht ins Repo)
+**/.claude/settings.local.json

@@ -1,0 +1,413 @@
+generator client {
+  provider        = "prisma-client-js"
+  // relationJoins: Relationen (include/select) werden als EIN SQL-Statement mit
+  // LATERAL JOINs geladen statt als mehrere SELECTs – deutlich weniger
+  // DB-Roundtrips. Preview-Feature (Postgres), global aktiviert.
+  //
+  // ACHTUNG: auch in Prisma 7 noch Preview, NICHT GA. Wird der Eintrag entfernt,
+  // verschwindet `relationLoadStrategy` aus den generierten Typen und Prisma fällt
+  // still auf die alte Multi-SELECT-Kaskade zurück (die 5 Aufrufstellen in
+  // routes/employees.ts, routes/pool.ts und routes/tasks.ts hängen daran).
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  // Ab Prisma 7 stehen hier KEINE Verbindungszeichenfolgen mehr: `url`/`directUrl`
+  // sind im Schema nicht mehr erlaubt. Die Migrations-Verbindung steht jetzt in
+  // ../prisma.config.ts, die Laufzeit-Verbindung baut src/db.ts als Driver Adapter
+  // (@prisma/adapter-pg) auf. Fachlich unveraendert: dieselbe lokale PostgreSQL 17.
+}
+
+// ---------------------------------------------------------------------------
+// Skill (Fähigkeit) – globaler Katalog; Schrittname = Fähigkeitsname (1:1)
+// ---------------------------------------------------------------------------
+model Skill {
+  id        String          @id @default(uuid())
+  name      String          @unique
+  steps     Step[]
+  employees EmployeeSkill[]
+  reminders Reminder[]
+}
+
+// ---------------------------------------------------------------------------
+// Employee (Mitarbeiter)
+// ---------------------------------------------------------------------------
+model Employee {
+  id            String          @id @default(uuid())
+  name          String
+  pin           String          @unique @db.Char(4)
+  // Rolle steuert ausschließlich die Oberfläche/Tab-Sichtbarkeit (Dashboard voll /
+  // Dashboard abgespeckt / PWA). Die EINSETZBARKEIT (Pool, Zuweisung) hängt davon
+  // NICHT ab – sie richtet sich weiterhin nur nach Skills + Anwesenheit, sodass
+  // z. B. auch ein Manager bei Bedarf einspringen kann.
+  role          Role            @default(WORKER)
+  deviceId      String?
+  deviceTrusted Boolean         @default(false)
+  // Anwesenheit (für spätere Statistik): standardmäßig anwesend; wird vom Manager
+  // nur bei Urlaub/Krankheit manuell auf false gesetzt.
+  present       Boolean         @default(true)
+  // Steuerquelle für `present`:
+  //   null        = Auto: Crewmeister-Stempelstatus steuert die Anwesenheit (Sync).
+  //   true / false = manuell gepinnt (gewinnt; Sync lässt den MA in Ruhe), z. B.
+  //                  wenn jemand sein Handy vergessen hat und nicht stempeln kann.
+  presenceOverride Boolean?
+  // Zuordnung zur Crewmeister-Zeiterfassung (numerische userId dort). Optional –
+  // nur gesetzte MA bekommen echte Arbeitszeit/Inaktiv-Werte in der Auswertung.
+  // Manuell gepflegt (kein Auto-Match: Crewmeister-employeeId/pinCode sind leer).
+  crewmeisterUserId Int?
+  skills        EmployeeSkill[]
+  assignments   Assignment[]
+  pushSubs      PushSubscription[]
+  workLogs      WorkLog[]
+  createdAt     DateTime        @default(now())
+  // Soft-Delete: gesetzt = "gelöscht". Mitarbeiter verschwindet aus Listen/Login,
+  // historische Zuweisungen (Statistik/TaskRun) bleiben aber erhalten. PIN bleibt
+  // reserviert, damit er nicht versehentlich neu vergeben wird.
+  deletedAt     DateTime?
+}
+
+// Rolle = welche Oberfläche der Nutzer bekommt (nicht: ob er einsetzbar ist):
+//   MANAGER – volles Dashboard (alle Tabs)
+//   OFFICE  – abgespecktes Dashboard (Büro, z. B. Lieferscheine buchen)
+//   WORKER  – Lager, arbeitet über die PWA
+enum Role {
+  MANAGER
+  OFFICE
+  WORKER
+}
+
+model EmployeeSkill {
+  employeeId String
+  skillId    String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  skill      Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([employeeId, skillId])
+}
+
+// ---------------------------------------------------------------------------
+// Task (Aufgabe) – dauerhaft & wiederverwendbar
+// ---------------------------------------------------------------------------
+model Task {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  priority    Priority   @default(MEDIUM)
+  status      TaskStatus @default(OPEN)
+  poolEnabled Boolean    @default(false)
+  // Wiederholen: bleibt die Aufgabe nach Abschluss automatisch im Pool und
+  // startet sofort einen neuen Lauf (finalizeTask hält poolEnabled dann true),
+  // statt aus dem Pool genommen zu werden. Standard: aus (manueller Neustart).
+  repeat      Boolean    @default(false)
+  // Reihenfolge im Aufgaben-Tab (per Drag & Drop, POST /tasks/reorder). Neue
+  // Aufgaben kommen oben an (kleinster Wert − 1). Dashboard und PWA sortieren
+  // weiter nach Priorität und nehmen diesen Wert nur bei gleicher Priorität.
+  orderIndex  Int        @default(0)
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  steps       Step[]
+  runs        TaskRun[]
+  // Erinnerungen, die diese Aufgabe in den Pool stellen (siehe model Reminder).
+  reminders   Reminder[]
+  createdAt   DateTime   @default(now())
+  // Soft-Delete: gesetzt = "gelöscht". Die Aufgabe verschwindet aus Listen/Pool/
+  // Stats; die TaskRun-Historie (eigenständiger Snapshot inkl. taskName) bleibt
+  // erhalten. Beim Löschen wird der Originalname freigegeben (Datensatz wird
+  // umbenannt), damit er neu vergeben werden kann.
+  deletedAt   DateTime?
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TaskStatus {
+  OPEN
+  RUNNING
+  COMPLETED
+}
+
+// ---------------------------------------------------------------------------
+// Step (Schritt) – gehört zu einer Aufgabe
+// ---------------------------------------------------------------------------
+model Step {
+  id           String           @id @default(uuid())
+  taskId       String
+  task         Task             @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  name         String
+  skillId      String
+  skill        Skill            @relation(fields: [skillId], references: [id])
+  description  String           @default("")
+  orderIndex   Int
+  minWorkers   Int?
+  maxWorkers   Int?
+  // Timer-Start des Schritts: Einzel-Schritt = erster Login; Team-Schritt erst
+  // bei Erreichen von minWorkers. null = Schritt läuft (noch) nicht.
+  startedAt    DateTime?
+  // availableAt = seit wann ist dieser Schritt ABHOLBAR (Status OPEN), d. h. alle
+  // Vorgänger erledigt UND die Aufgabe im Pool. Bezugspunkt für „wartet seit X"
+  // in PWA/Dashboard und für die Eskalations-Schwelle.
+  //   Gesetzt: bei Pool-Eintritt (Starten/Restart) für die dann offenen Schritte,
+  //            und in handleStepUnlocks, sobald der letzte Vorgänger fertig ist.
+  //   null:    Schritt ist gesperrt oder die Aufgabe ist nicht im Pool
+  //            (finalizeTask/restart setzen zurück).
+  // Bewusst NICHT aus Assignment-Zeiten abgeleitet: der frühere Behelf im
+  // Scheduler (letzter finishedAt, sonst task.startedAt) rechnete für spät
+  // freigeschaltete Schritte ab Aufgaben-Start und eskalierte sofort bei Freigabe.
+  availableAt  DateTime?
+  // Notiz-Verlauf des aktuellen Laufs (append-only): Array von Einträgen
+  // { id, authorType: "MA"|"MANAGER", authorName, text, at }. MA/Manager tragen
+  // Probleme, Mengen etc. ein. Wird bei Abschluss in TaskRun.data eingefroren und
+  // für den nächsten Lauf geleert (siehe finalizeTask / restart).
+  notes        Json             @default("[]")
+  // Pflichtnotiz beim Abschluss: Ist noteRequired gesetzt, weist
+  // POST /assignments/:id/complete den Abschluss ohne Angabe mit 400 ab. Der Wert
+  // wird als Notiz-Eintrag mit kind="COMPLETION" an `notes` angehängt (im selben
+  // Transaktions-Schritt wie der Abschluss) und wandert damit über den TaskRun-
+  // Snapshot ins Tagesjournal. Bewusst NICHT über eine vorab geschriebene Notiz
+  // gelöst: eine alte Freitext-Notiz würde die Pflicht sonst miterfüllen, und die
+  // gefragte Zahl (Menge o. ä.) steht ohnehin erst am Ende fest.
+  noteRequired Boolean          @default(false)
+  // Erwartete Form der Pflichtnotiz. NUMBER wird serverseitig geparst (deutsches
+  // Komma erlaubt) und zusätzlich als `value` im Eintrag abgelegt.
+  noteFormat   NoteFormat       @default(TEXT)
+  // Beschriftung des Eingabefelds, z. B. "Anzahl Paletten". Ohne sie stünde im
+  // Journal später nur eine nackte Zahl ohne Bezug.
+  noteLabel    String           @default("")
+  assignments  Assignment[]
+  // "Wartet auf": predecessors = Schritte, auf die dieser Schritt wartet
+  predecessors StepPredecessor[] @relation("Successor")
+  successors   StepPredecessor[] @relation("Predecessor")
+}
+
+// Selbstreferenz für die Vorgänger-Logik
+model StepPredecessor {
+  stepId        String // der wartende Schritt
+  predecessorId String // der Schritt, auf den gewartet wird
+  step          Step   @relation("Successor",   fields: [stepId],        references: [id], onDelete: Cascade)
+  predecessor   Step   @relation("Predecessor", fields: [predecessorId], references: [id], onDelete: Cascade)
+
+  @@id([stepId, predecessorId])
+}
+
+// ---------------------------------------------------------------------------
+// Assignment (Zuweisung) – ein Mitarbeiter an einem Schritt
+// ---------------------------------------------------------------------------
+model Assignment {
+  id           String          @id @default(uuid())
+  stepId       String
+  step         Step            @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  employeeId   String
+  employee     Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  // Schicht-Ersatz: trägt Erinnerung über Tageswechsel, dient Statistik
+  dayKey       DateTime        @db.Date
+  state        AssignmentState @default(ACTIVE)
+  pausedReason PausedReason?
+  startedAt    DateTime        @default(now())
+  // pausedAt = Beginn des AKTUELLEN (offenen) Pausen-Intervalls; null = läuft.
+  pausedAt     DateTime?
+  // pausedMs = kumulierte Dauer ALLER abgeschlossenen Pausen-Intervalle dieser
+  // Zuweisung. Beim Verlassen des Pausen-Zustands (Resume/Complete) wird das
+  // offene Intervall (now − pausedAt) draufaddiert. Damit gilt für die saubere
+  // Auswertung: Netto-Arbeitszeit = (finishedAt − startedAt) − pausedMs.
+  pausedMs     Int             @default(0)
+  // switchCount = wie oft diese Zuweisung mit Grund SWITCH unterbrochen wurde
+  // (Auto-Wechsel beim Einloggen auf einen anderen Schritt ODER manuelles
+  // „Unterbrechen"). Feierabend (END_OF_DAY) zählt NICHT. Für die Auswertung
+  // „wie oft hat der MA gewechselt" (statt der Dauer). Erst ab Einführung gezählt.
+  switchCount  Int             @default(0)
+  finishedAt   DateTime?
+}
+
+enum AssignmentState {
+  // Vom Manager angeboten, vom MA noch nicht angenommen (belegt keinen Platz)
+  OFFERED
+  ACTIVE
+  PAUSED
+  DONE
+  // Vom MA abgelehntes Angebot (Beleg für die Dashboard-Meldung)
+  REJECTED
+}
+
+enum PausedReason {
+  SWITCH
+  END_OF_DAY
+}
+
+// Erwartete Form der Pflichtnotiz beim Schritt-Abschluss (Step.noteFormat)
+enum NoteFormat {
+  TEXT
+  NUMBER
+}
+
+// ---------------------------------------------------------------------------
+// TaskRun (Historie) – unveränderlicher Snapshot pro abgeschlossenem Durchlauf
+// ---------------------------------------------------------------------------
+model TaskRun {
+  id         String   @id @default(uuid())
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskName   String
+  startedAt  DateTime
+  finishedAt DateTime
+  // Snapshot: beteiligte MA, Schritt-Zeiten, Pausen, Gesamtdauer
+  data       Json
+  workLogs   WorkLog[]
+  createdAt  DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// WorkLog – denormalisierte Auswertungs-Zeile pro (MA, Schritt, Durchlauf).
+// Wird bei Aufgaben-Abschluss (finalizeTask) zusätzlich zum TaskRun geschrieben
+// und beim Backfill aus bestehenden TaskRuns aufgebaut. Ermöglicht schnelle,
+// SQL-freundliche Historien-Auswertungen (aktive Zeit/Anzahl je MA über Zeit),
+// statt das TaskRun.data-JSON pro Anfrage zu parsen.
+// ---------------------------------------------------------------------------
+model WorkLog {
+  id         String   @id @default(uuid())
+  // onDelete: Cascade → beim Löschen eines Tagesjournals (TaskRun) verschwinden
+  // die zugehörigen WorkLogs automatisch mit.
+  runId      String
+  run        TaskRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  // Snapshot-Namen (historisch stabil, unabhängig von späteren Umbenennungen)
+  taskName   String
+  stepName   String
+  startedAt  DateTime
+  // finishedAt = Abschluss des Laufs; Zeitraumfilter + Tagesgruppierung laufen
+  // (wie bei /journal) über diese Spalte via localDayKey(finishedAt) – damit
+  // keine Zeitzonen-Off-by-one an Tagesgrenzen entsteht.
+  finishedAt DateTime
+  // Netto-Arbeitszeit der Zuweisung = finishedAt − startedAt − pausedMs
+  activeMs   Int
+  pausedMs   Int      @default(0)
+  // Anzahl der SWITCH-Unterbrechungen dieser Zuweisung (eingefroren aus
+  // Assignment.switchCount); alte Läufe = 0.
+  switchCount Int     @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([employeeId, finishedAt])
+  @@index([finishedAt])
+}
+
+// ---------------------------------------------------------------------------
+// PushSubscription – Web-Push-Abo pro Gerät (Empfänger für Web Push / VAPID)
+// ---------------------------------------------------------------------------
+model PushSubscription {
+  id           String   @id @default(uuid())
+  employeeId   String
+  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  // endpoint ist pro Gerät eindeutig → erlaubt Upsert und Dedupe
+  endpoint     String   @unique
+  // Vollständiges PushSubscription-Objekt ({ endpoint, keys: { p256dh, auth } })
+  subscription Json
+  createdAt    DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Settings – Singleton (id = "singleton")
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Reminder (Erinnerung) – wiederkehrende Dinge, an die jemand denken muss
+// (Wartung, Prüfung, Bestellung). Bewusst TAGESGENAU, nicht uhrzeitgenau:
+// fällig ist, was heute oder früher dran ist – das Dashboard zeigt es beim
+// Laden als Banner. Dadurch braucht es keinen Scheduler-Tick und kein
+// Nachholen verpasster Minuten.
+// ---------------------------------------------------------------------------
+model Reminder {
+  id          String  @id @default(uuid())
+  title       String
+  description String  @default("")
+
+  // Nächste Fälligkeit (lokale Mitternacht des Tages). Alles <= heute steht im
+  // Banner – Überfälliges verschwindet also nie von selbst.
+  dueDate     DateTime
+
+  // Takt. NONE = einmalig (nach der Entscheidung erledigt und weg).
+  repeatRule  RepeatRule @default(NONE)
+  // Parameter je Takt: INTERVAL → alle N Tage; WEEKLY → Wochentag (0=So..6=Sa);
+  // MONTHLY → Tag im Monat (1-31, auf den Monatsletzten gekappt).
+  intervalDays Int?
+  weekday      Int?
+  dayOfMonth   Int?
+
+  // Für die Aktion "Pool": Fähigkeit, die der Arbeitsschritt verlangt. Ohne
+  // Fähigkeit ist "Pool" nicht möglich (niemand wäre qualifiziert).
+  skillId     String?
+  skill       Skill?  @relation(fields: [skillId], references: [id], onDelete: SetNull)
+
+  // Die aus dieser Erinnerung erzeugte Aufgabe. Wird beim ERSTEN "Pool" angelegt
+  // und danach wiederverwendet – sonst entstünde bei jedem Takt eine neue
+  // Aufgabe im Aufgaben-Tab.
+  taskId      String?
+  task        Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  active      Boolean @default(true)
+  createdAt   DateTime @default(now())
+  // Soft-Delete wie bei Task/Employee: die Entscheidungs-Historie bleibt lesbar.
+  deletedAt   DateTime?
+
+  events      ReminderEvent[]
+
+  @@index([dueDate])
+}
+
+enum RepeatRule {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+  INTERVAL
+}
+
+// Entscheidung über eine fällige Erinnerung – der Journal-Eintrag dazu.
+// Eigene Tabelle statt eines künstlichen TaskRun: ein TaskRun ist ein
+// Arbeits-Durchlauf und zählt in Statistik und WorkLog mit; eine Erinnerung,
+// die jemand als "hinfällig" abhakt, ist keine geleistete Arbeit.
+model ReminderEvent {
+  id           String   @id @default(uuid())
+  reminderId   String?
+  reminder     Reminder? @relation(fields: [reminderId], references: [id], onDelete: SetNull)
+  // Titel-Snapshot: die Erinnerung kann später umbenannt oder gelöscht werden,
+  // der Journal-Eintrag muss trotzdem lesbar bleiben (gleiche Logik wie beim
+  // TaskRun-Snapshot).
+  reminderTitle String
+
+  decision     ReminderDecision
+  // Wer entschieden hat. Als NAME, nicht als Employee-Verweis: ADMIN ist keine
+  // Mitarbeiter-Zeile (geheime PIN aus ADMIN_PINS), hätte also keine id.
+  decidedByName String
+  decidedById   String?
+  decidedAt    DateTime @default(now())
+
+  // Nur bei POSTPONED: auf welchen Tag verschoben wurde.
+  postponedTo  DateTime?
+
+  @@index([decidedAt])
+}
+
+enum ReminderDecision {
+  DONE       // erledigt
+  POSTPONED  // verschoben (1-7 Tage)
+  POOLED     // in den Pool gestellt, ein MA übernimmt
+  OBSOLETE   // hinfällig – diesmal nicht nötig
+}
+
+model Settings {
+  id             String @id @default("singleton")
+  workStart      String @default("08:00") // "HH:mm"
+  workEnd        String @default("17:00") // "HH:mm"
+  escalationMins Int    @default(30)
+  // Feste Pause, in der die Eskalation schweigt ("HH:mm", Beginn einschließlich,
+  // Ende ausschließlich – wie workStart/workEnd). breakStart == breakEnd = keine
+  // Pause (analog journalRetentionDays = 0). Siehe services/quietHours.ts.
+  breakStart     String @default("12:00")
+  breakEnd       String @default("12:30")
+  // Aufbewahrungsdauer der Tagesjournale (TaskRun-Historie) in Tagen.
+  // 0 = deaktiviert (nichts wird automatisch gelöscht). N > 0 = Journale, die
+  // älter als N Tage sind, werden automatisch entfernt (WorkLogs via Cascade mit).
+  journalRetentionDays Int @default(0)
+}

@@ -1,0 +1,25 @@
+# Umgebungsvariablen
+# Alles Env-Artige ist ausgeschlossen - auch .env.production, .env.bak und
+# was sonst noch danebengelegt wird. Eine Aufzaehlung der bekannten Namen
+# waere die falsche Richtung: der naechste unbekannte Name waere dabei.
+.env*
+!.env.example
+!.env.production.example
+
+# Abhängigkeiten
+node_modules/
+
+# Build
+dist/
+
+# Prisma
+# Migrationen GEHÖREN ins Repo – NICHT ignorieren.
+# (Der generierte Client liegt in node_modules und ist bereits ausgeschlossen.)
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

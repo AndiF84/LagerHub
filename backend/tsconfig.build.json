@@ -1,0 +1,9 @@
+{
+  // Produktions-Build. Erbt alles von tsconfig.json und nimmt nur die Dateien
+  // heraus, die nicht auf den Server gehoeren: Tests (ziehen vitest nach, das in
+  // Produktion nicht installiert wird) und die Dev-Skripte (laufen ueber tsx).
+  // Die Typpruefung dieser Dateien bleibt erhalten - dafuer ist "npm run typecheck"
+  // da, das weiterhin gegen die vollstaendige tsconfig.json laeuft.
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/scripts", "src/testEnv.ts", "src/testDb.ts"]
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="LagerHub">
+  <rect width="512" height="512" rx="96" fill="#212c3d" />
+  <path d="M256 96 396 176 256 256 116 176Z" fill="#eec643" />
+  <path d="M116 176 256 256 256 416 116 336Z" fill="#ffffff" fill-opacity="0.95" />
+  <path d="M396 176 256 256 256 416 396 336Z" fill="#ffffff" fill-opacity="0.62" />
+</svg>

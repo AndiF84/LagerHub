@@ -1,0 +1,663 @@
+/* Mobile-first Basis-Styles der Mitarbeiter-PWA. Bewusst schlank; wächst mit den
+   Meilensteinen. Farbwelt an das Manager-Dashboard angelehnt. */
+/* Farbwelt abgeleitet von inter-drive.de: Navy (#212C3D) + Gold (#EEC643),
+   identisch zum Manager-Dashboard. --accent = Navy (Marken-Bg für Topbar,
+   Primär-Button, Angebot – jeweils weißer Text); --gold = Akzent.
+
+   Aufbau wie im Dashboard: Tokens (Farbe, Radius, Schatten) → Basis → Bausteine.
+   Bedienelemente sind bewusst großflächig (Handschuh-/Daumenbedienung im Lager). */
+:root {
+  --accent: #212c3d; /* Navy – Marken-Grundton */
+  --accent-700: #1a2431; /* dunkler (Hover) */
+  --accent-600: #2c3b50; /* heller Navy (Verlauf) */
+  --gold: #eec643; /* Gold – Akzent */
+  --gold-600: #d7ad2d; /* dunkleres Gold */
+  --gold-soft: #fbf1cf; /* helles Gold (Flächen) */
+  --bg: #e9edf3;
+  --card: #ffffff;
+  --text: #212c3d;
+  --muted: #6b7280;
+  --ok: #16a34a;
+  --bad: #b91c1c;
+  --border: #e3e8ef;
+  --border-strong: #d3d9e2;
+  --hover: #f3f5f8;
+
+  /* Radien etwas großzügiger als im Dashboard – wirkt auf kleinen Displays ruhiger */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+
+  --sh-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --sh-sm: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --sh-md: 0 4px 14px rgba(16, 24, 40, 0.09), 0 2px 4px rgba(16, 24, 40, 0.04);
+
+  --ring: 0 0 0 3px rgba(33, 44, 61, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tastatur-/Fokus-Sichtbarkeit (auch für externe Scanner-Tastaturen relevant). */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Topbar bleibt beim Scrollen stehen: Verbindungsstatus und Abmelden sind
+   damit jederzeit erreichbar, ohne nach oben zu scrollen. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  padding-top: max(14px, env(safe-area-inset-top));
+  background: linear-gradient(135deg, var(--accent-600) 0%, var(--accent) 60%);
+  color: #fff;
+  font-size: 18px;
+  border-bottom: 3px solid var(--gold);
+  box-shadow: var(--sh-md);
+}
+
+.topbar .muted {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo__mark {
+  display: block;
+  flex: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+.logo__word {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  color: #fff;
+}
+.logo__name {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+/* Kleiner Urheber-Schriftzug unter der Wortmarke; dezent (gedämpftes Weiß),
+   damit er das Gold-Akzent-„Hub" nicht überstrahlt. */
+.logo__by {
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.6);
+}
+/* „Andinsky" als kleine Gold-Signatur (das „by" bleibt gedämpft). */
+.logo__by-accent {
+  color: var(--gold);
+  font-weight: 600;
+}
+.logo__accent {
+  color: var(--gold); /* Gold auf Navy */
+}
+
+.content {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px;
+  box-shadow: var(--sh-xs);
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.ok {
+  color: var(--ok);
+}
+
+.bad {
+  color: var(--bad);
+}
+
+/* Buttons */
+.btn {
+  appearance: none;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  color: var(--text);
+  border-radius: var(--r-sm);
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: var(--sh-xs);
+  /* Kein blaues Tap-Highlight auf Android/iOS – wir zeigen eigenes Feedback. */
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+}
+
+/* Spürbarer Druckpunkt beim Antippen (wichtiger als Hover auf Touch-Geräten). */
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+  box-shadow: none;
+  background: var(--hover);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: var(--sh-sm);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-700);
+}
+.btn--primary:active:not(:disabled) {
+  background: var(--accent-700);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.topbar__btn {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.topbar__btn:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* Login-Screen */
+.login {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(120% 70% at 50% 0%, #e8ecf3 0%, var(--bg) 60%);
+}
+
+.login__card {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  border-radius: var(--r-lg);
+  padding: 26px 22px;
+  box-shadow: var(--sh-md);
+}
+
+.pin-input {
+  width: 100%;
+  margin: 10px 0 14px;
+  padding: 14px;
+  font-size: 28px;
+  letter-spacing: 12px;
+  text-align: center;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.pin-input:focus {
+  outline: none;
+  border-color: var(--accent-600);
+  box-shadow: var(--ring);
+}
+
+.error {
+  color: var(--bad);
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+.error--banner {
+  margin: 0 0 12px;
+  padding: 11px 12px;
+  background: #fef4f4;
+  border: 1px solid #f7d0d0;
+  border-left: 3px solid var(--bad);
+  border-radius: var(--r-sm);
+}
+
+/* Benachrichtigungs-Umschalter (M4) */
+.push-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  background: #eef2ff;
+  border: 1px solid #ccd4fb;
+  border-left: 3px solid #4f46e5;
+  border-radius: var(--r-sm);
+  font-size: 15px;
+  color: #3730a3;
+}
+.push-bar .btn {
+  margin-left: auto;
+}
+.push-bar--muted {
+  background: var(--card);
+  border-color: var(--border);
+  border-left-color: var(--border-strong);
+  color: var(--muted);
+  font-size: 14px;
+}
+.push-bar__error {
+  flex-basis: 100%;
+  color: var(--bad);
+  font-size: 14px;
+}
+
+/* Erinnerung an eigene unterbrochene Schritte (WORK_REMINDER) */
+.reminders {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-left: 3px solid #2f6fbd;
+  border-radius: var(--r-sm);
+  font-size: 15px;
+  color: #1e3a8a;
+  box-shadow: var(--sh-xs);
+}
+
+/* Rückzug einer Aufgabe: kein Info-Blau wie die Erinnerung, sondern der
+   Warnton – hier hat sich von außen etwas an der eigenen Arbeit geändert. */
+.reminder--withdrawn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  border-left-color: #d97706;
+  color: #78350f;
+}
+
+.reminder__close {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  margin-left: auto;
+  opacity: 0.7;
+}
+.reminder__close:active {
+  opacity: 1;
+}
+
+/* Verbindungs-Indikator in der Topbar */
+.conn {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #9ca3af;
+  margin-right: 4px;
+  flex: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
+}
+.conn--open {
+  background: #4ade80;
+}
+.conn--connecting {
+  background: #fbbf24;
+}
+.conn--closed {
+  background: #f87171;
+}
+
+/* Pool / Aufgaben (M2) */
+.pool {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Gruppen: "Meine Arbeit" (aktiv/unterbrochen) oben, "Verfügbare Aufgaben"
+   optisch abgesetzt darunter. */
+/* Abstand zwischen Aufgaben bewusst größer als der zwischen Schritten (12px),
+   damit die Karte als Einheit gelesen wird und nicht als Fortsetzung der Liste. */
+.pool-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pool-group__title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+
+/* Trennlinie über "Verfügbare Aufgaben", damit sich der Block klar von der
+   eigenen Arbeit absetzt. */
+.pool-group--open {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+/* Eigene Arbeit: Titel in Navy statt Grau – der Block, der zuerst zählt. */
+.pool-group--mine > .pool-group__title {
+  color: var(--accent);
+}
+
+/* Die Karte trägt bewusst mehr Gewicht als ihre Innen-Trennlinien: kräftigerer
+   Rahmen + tragender Schatten. Sonst liest sich "Aufgabe" wie "noch ein Schritt". */
+.task-card {
+  padding: 14px;
+  border-color: var(--border-strong);
+  box-shadow: var(--sh-md);
+}
+
+/* Eigene Karten farblich hervorheben: aktiv = grün, unterbrochen = gelb. */
+.task-card--active {
+  border-left: 4px solid var(--ok);
+}
+.task-card--paused {
+  border-left: 4px solid #d97706;
+}
+
+.task-card__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.step-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-row {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.step-row:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.step-row__main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.step-row__name {
+  font-weight: 600;
+}
+
+.step-row__team {
+  font-size: 13px;
+}
+
+.step-row__others {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.step-row__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.step-row__actions .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+.step-row__full {
+  font-size: 14px;
+  padding: 12px 0;
+}
+
+/* Alter eines Arbeitsschritts ("⏱ 42 min"), rechts vor der Notiz-Schaltfläche.
+   Bewusst KEINE zweite Pille neben dem Status-Badge: der Status ist die
+   Aussage, das Alter die Fußnote – als Pille würden beide um dieselbe
+   Aufmerksamkeit ringen. Farbe erst, wenn sie etwas bedeutet.
+   Ampel-Stufen aus Settings.escalationMins (siehe lib/stepAge.ts);
+   Farbwerte identisch zum Dashboard. */
+.step-age {
+  font-size: 13px;
+  white-space: nowrap;
+  /* Gleich breite Ziffern: sonst wandert die Zahl bei jedem Minutenwechsel. */
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.step-age--warn {
+  color: #8a5d00;
+  font-weight: 600;
+}
+.step-age--over {
+  color: #b42318;
+  font-weight: 600;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  background: #eef2f7;
+  color: #475569;
+  box-shadow: inset 0 0 0 1px #dde4ed;
+}
+.badge--ok {
+  background: #e6f5ec;
+  color: #15803d;
+  box-shadow: inset 0 0 0 1px #bfe5cf;
+}
+.badge--warn {
+  background: #fdf4e3;
+  color: #b45309;
+  box-shadow: inset 0 0 0 1px #f2ddab;
+}
+.badge--muted {
+  background: #f2f4f6;
+  color: #94a3b8;
+  box-shadow: inset 0 0 0 1px #e5e8ec;
+}
+.badge--high {
+  background: #fdeceb;
+  color: #b91c1c;
+  box-shadow: inset 0 0 0 1px #f6cdc9;
+}
+.badge--offer {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* Angebot-Hervorhebung der Schritt-Zeile */
+.step-row--offer {
+  margin: 6px -8px 0;
+  padding: 12px 8px 2px;
+  border-top: none;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-600);
+  border-radius: var(--r-sm);
+}
+.step-row--offer + .step-row {
+  border-top: none;
+}
+
+/* Notiz-Umschalter + Panel */
+.step-row__notes-btn {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.notes {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-strong);
+}
+
+.notes__empty {
+  margin: 2px 0 8px;
+  font-size: 14px;
+}
+
+.notes__list {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  font-size: 14px;
+}
+.notes__list li {
+  margin-bottom: 6px;
+}
+
+.notes__input {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  margin-bottom: 8px;
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.notes__input:focus {
+  outline: none;
+  border-color: var(--accent-600);
+  box-shadow: var(--ring);
+}
+
+/* Pflichtnotiz beim Abschluss (CompletionNotePrompt). Gold-Tint wie die
+   Angebots-Karte: beides fordert eine Reaktion des MA, bevor es weitergeht.
+   Der Rahmen macht deutlich, dass der Abschluss noch aussteht. */
+.completion-note {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--gold);
+  border-radius: var(--r-md);
+  background: #fdf8e8; /* Gold --gold, 12 % auf Weiß */
+}
+
+.completion-note__label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.completion-note input {
+  width: 100%;
+  padding: 12px;
+  font-size: 17px; /* ≥16px: iOS zoomt sonst beim Fokus in das Feld hinein */
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.completion-note input:focus {
+  outline: none;
+  border-color: var(--accent-600);
+  box-shadow: var(--ring);
+}
+
+.completion-note__hint {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.completion-note__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.completion-note__actions .btn {
+  flex: 1;
+}
+
+/* Nutzer mit reduzierter Bewegung: keine Übergänge/Animationen. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
