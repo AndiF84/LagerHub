@@ -7,6 +7,30 @@ ohne Neuladen sofort auf allen Geräten sichtbar.
 LagerHub bildet die tatsächlichen Abläufe eines Lagers ab und ist für den
 Einsatz auf einem Windows Server im Firmennetz ausgelegt.
 
+<table>
+  <tr>
+    <td width="70%"><img src="docs/screenshots/Dashboard.png" alt="Manager-Dashboard mit fälliger Erinnerung, Auslastungstacho und laufenden Aufgaben"></td>
+    <td width="30%"><img src="docs/screenshots/PWA.png" alt="Mitarbeiter-App am Handy mit laufendem Arbeitsschritt"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Dashboard: fällige Erinnerung, Team-Auslastung, laufende Aufgaben mit Pflichtnotiz beim Abschluss</sub></td>
+    <td align="center"><sub>Mitarbeiter-App am Handy</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/Aufgaben.png" alt="Aufgaben-Tab mit Arbeitsschritten und Vorgängern"></td>
+    <td width="50%"><img src="docs/screenshots/Statistik.png" alt="Auswertung je Mitarbeiter über einen Zeitraum"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Aufgaben aus Schritten mit Vorgängern aufbauen</sub></td>
+    <td align="center"><sub>Auswertung je Mitarbeiter mit Excel-Export</sub></td>
+  </tr>
+</table>
+
+<sub>Alle Namen und Daten in den Screenshots sind erfunden.</sub>
+
 ---
 
 ## Was es kann
