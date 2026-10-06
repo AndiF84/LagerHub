@@ -109,6 +109,23 @@ verloren geht.
 
 ---
 
+## Über das Projekt
+
+LagerHub ist ein Privatprojekt von Andreas Funke, entstanden von Juni bis
+Oktober 2026. Ausgangspunkt waren die Abläufe in einem realen Lager; dafür ist
+das System entworfen und für die Installation auf dem dortigen Windows Server
+vorbereitet, inklusive Übergabe-Paket, Installations- und Update-Skript und
+Dokumentation für die IT.
+
+Umgesetzt habe ich es mit **Claude Code** (KI-Assistent von Anthropic) als
+Werkzeug. Anforderungen, fachliche Regeln und Architekturentscheidungen kommen
+von mir, ebenso die Tests am echten Gerät und die Abnahme jeder Änderung. Die
+Datei [`CLAUDE.md`](CLAUDE.md) ist die Projektanleitung, mit der ich die KI
+steuere, und zugleich die vollständige technische Dokumentation mit allen
+Geschäftsregeln und den Gründen hinter den Entscheidungen.
+
+---
+
 ## Projektstruktur
 
 ```
@@ -117,9 +134,6 @@ frontend/   Manager-Dashboard (React)
 pwa/        Mitarbeiter-App (React, PWA)
 docs/       Übergabe- und Installationsdokumentation für die IT
 ```
-
-Eine ausführliche technische Beschreibung mit allen Geschäftsregeln und
-Designentscheidungen steht in [`CLAUDE.md`](CLAUDE.md).
 
 ---
 
